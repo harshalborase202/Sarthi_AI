@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, Clock, ShieldCheck, UserCheck, FileText, MessageSquare, ShieldAlert, Sparkles, Check, Trash2, X, AlertTriangle } from 'lucide-react';
+import { Brain, Clock, ShieldCheck, UserCheck, FileText, MessageSquare, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
 import { translations } from '../data/translations';
+
+// Icon Map for safe serialization in localStorage
+const ICON_MAP = {
+  userCheck: UserCheck,
+  fileText: FileText,
+  messageSquare: MessageSquare,
+  shieldCheck: ShieldCheck
+};
 
 export default function MemoryCenter({ language }) {
   const t = translations[language] || translations.EN;
 
-  // Initial timeline card entries
+  // Initial timeline card entries with string icon keys
   const INITIAL_CARDS = [
     {
       id: 'profile_details',
       title: 'Profile Details',
-      icon: UserCheck,
+      iconName: 'userCheck',
       speechBubble: 'I can remember your age, state, and education level for faster searches next time.',
       status: 'until_delete', // until_delete | 30_days | session_only | never_stored
       expiryDate: null,
@@ -20,7 +28,7 @@ export default function MemoryCenter({ language }) {
     {
       id: 'income_cert',
       title: 'Income Certificate',
-      icon: FileText,
+      iconName: 'fileText',
       speechBubble: 'This document helps verify income-based eligibility.',
       status: '30_days',
       expiryDate: '5 Sept 2026',
@@ -30,7 +38,7 @@ export default function MemoryCenter({ language }) {
     {
       id: 'gate_prep',
       title: 'GATE Exam Prep',
-      icon: MessageSquare,
+      iconName: 'messageSquare',
       speechBubble: 'You mentioned preparing for GATE — I can use this to suggest education schemes.',
       status: 'session_only',
       expiryDate: null,
@@ -40,7 +48,7 @@ export default function MemoryCenter({ language }) {
     {
       id: 'aadhaar_card',
       title: 'Aadhaar Card',
-      icon: ShieldCheck,
+      iconName: 'shieldCheck',
       speechBubble: '🔒 Never stored — image was discarded immediately after verification.',
       status: 'never_stored',
       expiryDate: null,
@@ -52,7 +60,12 @@ export default function MemoryCenter({ language }) {
   const [cards, setCards] = useState(() => {
     const saved = localStorage.getItem('sarthi_memory_center_cards');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].iconName) {
+          return parsed;
+        }
+      } catch (e) {}
     }
     return INITIAL_CARDS;
   });
@@ -114,6 +127,7 @@ export default function MemoryCenter({ language }) {
 
     localStorage.removeItem('sarthi_verified_docs');
     sessionStorage.removeItem('sarthi_session_docs');
+    localStorage.removeItem('sarthi_memory_center_cards');
     setShowConfirmForgetModal(false);
 
     setSuccessToast("Everything has been forgotten. Zero personal data remains stored.");
@@ -171,7 +185,7 @@ export default function MemoryCenter({ language }) {
       {/* Timeline Card Feed */}
       <div className="space-y-4 pt-1">
         {cards.map((card) => {
-          const CardIcon = card.icon;
+          const CardIcon = ICON_MAP[card.iconName] || ShieldCheck;
           const isEditing = editingCardId === card.id;
 
           return (
