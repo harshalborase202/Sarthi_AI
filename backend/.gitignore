@@ -1,0 +1,31 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Database files
+*.db
+*.sqlite3
+
+# Environment / secrets - NEVER commit your real API key
+.env
+
+# Vector store cache (regenerates automatically on first run)
+vector_cache.json
+
+# ChromaDB persist dir (if re-added later)
+chroma_db/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
