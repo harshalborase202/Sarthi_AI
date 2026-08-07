@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import ProfileInput from './components/ProfileInput';
 import AIReasoningModal from './components/AIReasoningModal';
@@ -6,11 +7,14 @@ import EligibleSchemes from './components/EligibleSchemes';
 import SchemeDetailModal from './components/SchemeDetailModal';
 import WhyNotEligible from './components/WhyNotEligible';
 import NoSchemes from './components/NoSchemes';
+import BottomNavbar from './components/BottomNavbar';
+import DocumentUpload from './components/DocumentUpload';
+import ProfileSettings from './components/ProfileSettings';
 import { evaluateProfile } from './data/schemes';
 
-export default function App() {
+function AppContent() {
+  const navigate = useNavigate();
   const [language, setLanguage] = useState('EN');
-  const [screen, setScreen] = useState('profile'); // profile | reasoning | eligible | why_not_eligible | no_schemes
 
   // Pre-filled defaults matching demo script in README
   const [profile, setProfile] = useState({
@@ -24,26 +28,36 @@ export default function App() {
     disability: 'no'
   });
 
-  const [evaluationResult, setEvaluationResult] = useState({ eligible: [], ineligible: [] });
+  const [evaluationResult, setEvaluationResult] = useState(() => evaluateProfile({
+    age: '22',
+    gender: 'female',
+    state: 'Maharashtra',
+    occupation: 'student',
+    income: '250000',
+    category: 'sc',
+    education: 'graduate',
+    disability: 'no'
+  }));
+
   const [selectedScheme, setSelectedScheme] = useState(null);
 
   const handleProfileSubmit = () => {
     const result = evaluateProfile(profile);
     setEvaluationResult(result);
-    setScreen('reasoning');
+    navigate('/reasoning');
   };
 
   const handleReasoningComplete = () => {
     if (evaluationResult.eligible.length > 0) {
-      setScreen('eligible');
+      navigate('/services');
     } else {
-      setScreen('no_schemes');
+      navigate('/no-schemes');
     }
   };
 
   const handleReset = () => {
-    setScreen('profile');
     setSelectedScheme(null);
+    navigate('/');
   };
 
   return (
@@ -52,57 +66,99 @@ export default function App() {
         language={language}
         setLanguage={setLanguage}
         onReset={handleReset}
-        currentScreen={screen}
-        setScreen={setScreen}
+        currentScreen="active"
+        setScreen={(scr) => {
+          if (scr === 'profile') navigate('/');
+          else if (scr === 'eligible') navigate('/services');
+        }}
       />
 
-      <main className="flex-grow pt-20 pb-12">
-        {screen === 'profile' && (
-          <ProfileInput
-            profile={profile}
-            setProfile={setProfile}
-            onSubmit={handleProfileSubmit}
-            language={language}
+      <main className="flex-grow pt-20 pb-24">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProfileInput
+                profile={profile}
+                setProfile={setProfile}
+                onSubmit={handleProfileSubmit}
+                language={language}
+              />
+            }
           />
-        )}
 
-        {screen === 'reasoning' && (
-          <AIReasoningModal
-            profile={profile}
-            onComplete={handleReasoningComplete}
-            language={language}
+          <Route
+            path="/reasoning"
+            element={
+              <AIReasoningModal
+                profile={profile}
+                onComplete={handleReasoningComplete}
+                language={language}
+              />
+            }
           />
-        )}
 
-        {screen === 'eligible' && (
-          <EligibleSchemes
-            eligibleList={evaluationResult.eligible}
-            ineligibleList={evaluationResult.ineligible}
-            profile={profile}
-            onSelectScheme={(scheme) => setSelectedScheme(scheme)}
-            onViewIneligible={() => setScreen('why_not_eligible')}
-            onEditProfile={() => setScreen('profile')}
-            language={language}
+          <Route
+            path="/services"
+            element={
+              <EligibleSchemes
+                eligibleList={evaluationResult.eligible}
+                ineligibleList={evaluationResult.ineligible}
+                profile={profile}
+                onSelectScheme={(scheme) => setSelectedScheme(scheme)}
+                onViewIneligible={() => navigate('/why-not-eligible')}
+                onEditProfile={() => navigate('/')}
+                language={language}
+              />
+            }
           />
-        )}
 
-        {screen === 'why_not_eligible' && (
-          <WhyNotEligible
-            ineligibleList={evaluationResult.ineligible}
-            eligibleList={evaluationResult.eligible}
-            onBack={() => setScreen('eligible')}
-            onSelectScheme={(scheme) => setSelectedScheme(scheme)}
-            language={language}
+          <Route
+            path="/why-not-eligible"
+            element={
+              <WhyNotEligible
+                ineligibleList={evaluationResult.ineligible}
+                eligibleList={evaluationResult.eligible}
+                onBack={() => navigate('/services')}
+                onSelectScheme={(scheme) => setSelectedScheme(scheme)}
+                language={language}
+              />
+            }
           />
-        )}
 
-        {screen === 'no_schemes' && (
-          <NoSchemes
-            onReset={handleReset}
-            language={language}
+          <Route
+            path="/no-schemes"
+            element={
+              <NoSchemes
+                onReset={handleReset}
+                language={language}
+              />
+            }
           />
-        )}
+
+          <Route
+            path="/verify"
+            element={
+              <DocumentUpload
+                language={language}
+              />
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProfileSettings
+                profile={profile}
+                language={language}
+              />
+            }
+          />
+        </Routes>
       </main>
+
+      {/* Persistent Bottom Navigation Bar */}
+      <BottomNavbar language={language} />
 
       {/* Scheme Detail & Decision Tree Modal */}
       {selectedScheme && (
@@ -113,5 +169,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

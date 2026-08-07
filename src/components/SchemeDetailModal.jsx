@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { X, GitBranch, CheckSquare, Square, FileText, ExternalLink, ShieldCheck, Award, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, GitBranch, CheckSquare, Square, FileText, ExternalLink, ShieldCheck, Award, ArrowRight, Upload } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function SchemeDetailModal({ scheme, onClose, language }) {
+  const navigate = useNavigate();
   if (!scheme) return null;
   const t = translations[language] || translations.EN;
 
@@ -133,11 +135,26 @@ export default function SchemeDetailModal({ scheme, onClose, language }) {
                     <span className="text-xs font-semibold">{doc.name}</span>
                   </div>
 
-                  {doc.required && (
-                    <span className="text-[10px] font-bold text-error bg-error-container/60 px-2 py-0.5 rounded-full">
-                      Mandatory
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onClose) onClose();
+                        navigate(`/verify?doc=${doc.id}`);
+                      }}
+                      className="py-1 px-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>Upload to Verify</span>
+                    </button>
+
+                    {doc.required && (
+                      <span className="text-[10px] font-bold text-error bg-error-container/60 px-2 py-0.5 rounded-full">
+                        Mandatory
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}
