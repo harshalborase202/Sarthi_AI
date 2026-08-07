@@ -223,6 +223,69 @@ export default function SchemeChatbot({ profile, language }) {
     setTimeout(() => setSaveSuccessNotice(null), 4000);
   };
 
+  // Parse Markdown bold, bullets, headers and dividers into styled elements
+  const formatMarkdownText = (rawText) => {
+    if (!rawText) return null;
+    const lines = rawText.split('\n');
+
+    return lines.map((line, idx) => {
+      let cleaned = line.trim();
+      if (!cleaned) return null;
+
+      if (cleaned === '---') {
+        return <hr key={idx} className="my-2 border-outline-variant/40" />;
+      }
+
+      let isHeader = false;
+      if (cleaned.startsWith('###') || cleaned.startsWith('##') || cleaned.startsWith('#')) {
+        cleaned = cleaned.replace(/^#+\s*/, '');
+        isHeader = true;
+      }
+
+      let isBullet = false;
+      if (cleaned.startsWith('* ') || cleaned.startsWith('- ')) {
+        cleaned = cleaned.replace(/^[*|-]\s*/, '');
+        isBullet = true;
+      }
+
+      // Format bold tags **text**
+      const parts = cleaned.split(/(\*\*.*?\*\*)/g);
+      const formattedParts = parts.map((part, pIdx) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <strong key={pIdx} className="font-extrabold text-on-surface">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return part;
+      });
+
+      if (isHeader) {
+        return (
+          <div key={idx} className="font-extrabold text-sm text-primary dark:text-primary-fixed mt-2 mb-1 flex items-center gap-1">
+            {formattedParts}
+          </div>
+        );
+      }
+
+      if (isBullet) {
+        return (
+          <div key={idx} className="flex items-start gap-2 my-1 text-xs text-on-surface">
+            <span className="text-primary font-black mt-0.5">•</span>
+            <div className="flex-1">{formattedParts}</div>
+          </div>
+        );
+      }
+
+      return (
+        <div key={idx} className="text-xs leading-relaxed text-on-surface my-0.5">
+          {formattedParts}
+        </div>
+      );
+    });
+  };
+
   // Render Card-based Scan-able formatting for AI Bot Messages
   const renderBotMessageContent = (msg) => {
     const text = msg.text || '';
@@ -251,11 +314,9 @@ export default function SchemeChatbot({ profile, language }) {
                   <div className="font-extrabold text-sm text-primary dark:text-primary-fixed flex items-center gap-2">
                     {paragraph.split('\n')[0]}
                   </div>
-                  {paragraph.split('\n').slice(1).map((line, lIdx) => (
-                    <p key={lIdx} className="text-xs text-on-surface-variant leading-relaxed">
-                      {line}
-                    </p>
-                  ))}
+                  <div className="text-xs text-on-surface-variant leading-relaxed">
+                    {formatMarkdownText(paragraph.split('\n').slice(1).join('\n'))}
+                  </div>
                 </div>
               );
             }
@@ -279,11 +340,7 @@ export default function SchemeChatbot({ profile, language }) {
                     {paragraph.split('\n')[0]}
                   </div>
                   <div className="text-xs space-y-1 opacity-90">
-                    {paragraph.split('\n').slice(1).map((line, lIdx) => (
-                      <div key={lIdx} className="flex items-start gap-1.5">
-                        <span className="mt-0.5">{line}</span>
-                      </div>
-                    ))}
+                    {formatMarkdownText(paragraph.split('\n').slice(1).join('\n'))}
                   </div>
                 </div>
               );
@@ -296,11 +353,7 @@ export default function SchemeChatbot({ profile, language }) {
                     <FileText className="w-4 h-4 text-primary" /> Required Documents Checklist
                   </div>
                   <div className="text-xs space-y-1 text-on-surface-variant font-medium">
-                    {paragraph.split('\n').slice(1).map((line, lIdx) => (
-                      <div key={lIdx} className="flex items-center gap-2">
-                        {line}
-                      </div>
-                    ))}
+                    {formatMarkdownText(paragraph.split('\n').slice(1).join('\n'))}
                   </div>
                 </div>
               );
@@ -312,9 +365,9 @@ export default function SchemeChatbot({ profile, language }) {
                   <div className="font-extrabold text-xs text-primary flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-saffron" /> AI Simplifier (In Simple Words)
                   </div>
-                  <p className="text-xs italic text-on-surface-variant">
-                    {paragraph.replace('💡 **In Simple Words (AI Simplifier)**:', '').replace('💡 **सरल शब्दों में (AI Simplifier)**:', '')}
-                  </p>
+                  <div className="text-xs italic text-on-surface-variant">
+                    {formatMarkdownText(paragraph.replace('💡 **In Simple Words (AI Simplifier)**:', '').replace('💡 **सरल शब्दों में (AI Simplifier)**:', ''))}
+                  </div>
                 </div>
               );
             }
@@ -334,9 +387,9 @@ export default function SchemeChatbot({ profile, language }) {
             }
 
             return (
-              <p key={pIdx} className="text-xs text-on-surface leading-relaxed whitespace-pre-line">
-                {paragraph}
-              </p>
+              <div key={pIdx} className="text-xs text-on-surface leading-relaxed">
+                {formatMarkdownText(paragraph)}
+              </div>
             );
           })}
         </div>
