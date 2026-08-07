@@ -23,23 +23,12 @@ async def reasoning_stream(body: ReasoningRequest):
         index = 0
         try:
             async for step_text in stream_reasoning(body.profile.model_dump(), body.language):
-                data = json.dumps({"step": step_text, "index": index})
-                yield f"data: {data}\n\n"
+                payload = json.dumps({"step": step_text, "index": index})
+                yield f"data: {payload}\n\n"
                 index += 1
-                await asyncio.sleep(0.05)  # Throttle slightly for smooth animation
+                await asyncio.sleep(0.3)
         except Exception as e:
-            error_data = json.dumps({"step": f"Analysis complete.", "index": index, "done": True})
-            yield f"data: {error_data}\n\n"
-        finally:
-            done_data = json.dumps({"step": "", "index": index, "done": True})
-            yield f"data: {done_data}\n\n"
+            err_payload = json.dumps({"step": f"Reasoning stream fallback: {str(e)}", "index": index})
+            yield f"data: {err_payload}\n\n"
 
-    return StreamingResponse(
-        event_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Access-Control-Allow-Origin": "*",
-        }
-    )
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

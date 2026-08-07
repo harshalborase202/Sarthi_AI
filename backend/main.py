@@ -39,11 +39,6 @@ async def lifespan(app: FastAPI):
     print("[Sarthi AI] Starting up...")
     init_db()
     print("[Sarthi AI] SQLite initialized.")
-    try:
-        initialize_vector_store()
-        print("[Sarthi AI] Vector store (Gemini embeddings + numpy) ready.")
-    except Exception as e:
-        print(f"[Sarthi AI] Vector store startup warning (will init on first search): {e}")
     yield
     print("[Sarthi AI] Shutting down.")
 
@@ -61,7 +56,9 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# ─── CORS Middleware ──────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# CORS Middleware
+# ─────────────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[CORS_ORIGIN, "http://localhost:3001", "http://localhost:5173", "http://127.0.0.1:3000"],
@@ -70,7 +67,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Register Routers ─────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Register Routers
+# ─────────────────────────────────────────────────────────────────────────────
 app.include_router(evaluate.router)
 app.include_router(schemes.router)
 app.include_router(memory.router)
@@ -80,7 +79,9 @@ app.include_router(search.router)
 app.include_router(documents.router)
 
 
-# ─── Health Check ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Health Check
+# ─────────────────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])
 async def health():
     return {

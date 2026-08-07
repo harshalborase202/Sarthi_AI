@@ -1,8 +1,8 @@
 """
-GET    /api/memory            — List all memory items
-POST   /api/memory            — Create a new memory item
-PUT    /api/memory/{id}       — Update memory item retention status
-DELETE /api/memory/{id}       — Delete one memory item
+GET    /api/memory           — List all memory items
+POST   /api/memory           — Create a new memory item
+PUT    /api/memory/{id}      — Update memory item retention status
+DELETE /api/memory/{id}      — Delete one memory item
 DELETE /api/memory/forget-all — Delete all memory items
 """
 import uuid
@@ -63,7 +63,7 @@ def _purge_expired():
         )
     )
     for item in expired:
-        delete_memory_from_chroma(item.id)
+        delete_memory_from_vector_store(item.id)
         item.delete_instance()
 
 

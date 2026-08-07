@@ -54,69 +54,103 @@ export default function AIReasoningModal({ profile, onComplete, language }) {
         <div className="flex items-center justify-between border-b border-outline-variant/40 pb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-              <Cpu className="w-7 h-7 text-primary animate-pulse" />
+              <Cpu className="w-6 h-6 text-saffron" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
-                {t.reasoningTitle}
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-saffron/15 text-saffron">
-                  <Sparkles className="w-3 h-3 mr-1" /> Live Stream
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl md:text-2xl font-black text-primary">{t.reasoningTitle}</h1>
+                <span className="bg-saffron text-primary text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  PS01 Engine
                 </span>
-              </h2>
-              <p className="text-xs text-on-surface-variant">{t.reasoningSubtitle}</p>
+              </div>
+              <p className="text-xs text-on-surface-variant mt-1">{t.reasoningSubtitle}</p>
             </div>
-          </div>
-
-          <div className="text-right">
-            <span className="text-xs font-semibold text-outline uppercase tracking-wider">{t.confidenceLabel}</span>
-            <div className="text-2xl font-black text-emerald-600">96.4%</div>
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs font-semibold text-on-surface-variant">
-            <span>AI Rule Processing Engine</span>
-            <span>{Math.min(Math.round(progress), 100)}%</span>
+        {/* Live Progress Bar Section */}
+        <div className="space-y-3 bg-surface p-6 rounded-2xl border border-outline-variant/40">
+          <div className="flex items-center justify-between text-xs font-bold">
+            <span className="text-on-surface flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-saffron animate-pulse" /> Stream Progress
+            </span>
+            <span className="text-primary font-mono text-sm">{Math.round(progress)}%</span>
           </div>
-          <div className="w-full h-3 bg-surface-container-high rounded-full overflow-hidden p-0.5">
+
+          <div className="w-full bg-surface-variant rounded-full h-3 overflow-hidden p-0.5">
             <div 
-              className="h-full bg-gradient-to-r from-primary via-secondary-container to-emerald-500 rounded-full transition-all duration-300 shadow-sm"
-              style={{ width: `${Math.min(progress, 100)}%` }}
+              className="bg-gradient-to-r from-primary via-secondary-container to-saffron h-full rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
             />
           </div>
+
+          <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
+            <span>{t.confidenceLabel}: <strong className="text-emerald-700">96.4% High</strong></span>
+            <span>Latency: <strong className="text-primary">120ms</strong></span>
+          </div>
         </div>
 
-        {/* Live Stream Terminal */}
-        <div className="bg-slate-900 text-slate-100 rounded-2xl p-5 font-mono text-xs space-y-3.5 shadow-inner border border-slate-800 max-h-72 overflow-y-auto">
-          {steps.slice(0, currentStepIndex + 1).map((step, idx) => (
-            <div key={idx} className="flex items-start gap-3 animate-fadeIn">
-              {idx === currentStepIndex && progress < 100 ? (
-                <Loader2 className="w-4 h-4 text-saffron animate-spin shrink-0 mt-0.5" />
-              ) : (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              )}
-              <div>
-                <div className="font-semibold text-slate-100">{step.text}</div>
-                <div className="text-[11px] text-slate-400 mt-0.5">{step.detail}</div>
-              </div>
-            </div>
-          ))}
+        {/* Real-time Reasoning Logs Timeline */}
+        <div className="space-y-4">
+          <h2 className="text-xs font-extrabold uppercase text-outline tracking-wider">
+            Live Field Rationale & Policy Trace
+          </h2>
+
+          <div className="space-y-3">
+            {steps.map((step, idx) => {
+              const isDone = idx < currentStepIndex || progress >= 100;
+              const isCurrent = idx === currentStepIndex && progress < 100;
+
+              return (
+                <div 
+                  key={idx}
+                  className={`p-4 rounded-2xl border transition-all duration-300 flex items-start gap-3.5 ${
+                    isCurrent
+                      ? 'bg-primary/5 border-primary/30 shadow-sm'
+                      : isDone
+                      ? 'bg-surface border-outline-variant/40 opacity-90'
+                      : 'bg-surface/40 border-dashed border-outline-variant/30 opacity-40'
+                  }`}
+                >
+                  <div className="mt-0.5 shrink-0">
+                    {isDone ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    ) : isCurrent ? (
+                      <Loader2 className="w-5 h-5 text-saffron animate-spin" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center text-[10px] text-outline">
+                        {idx + 1}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className={`text-xs md:text-sm font-bold ${isCurrent ? 'text-primary' : 'text-on-surface'}`}>
+                      {step.text}
+                    </p>
+                    <p className="text-[11px] text-on-surface-variant">
+                      {step.detail}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Action button */}
-        <div className="pt-2 flex justify-end">
+        {/* Action Button */}
+        <div className="pt-4 border-t border-outline-variant/40">
           <button
             onClick={onComplete}
-            disabled={progress < 30}
-            className={`py-3.5 px-8 rounded-xl font-bold text-sm shadow-md flex items-center gap-2 transition-all cursor-pointer ${
-              progress >= 30
-                ? 'bg-primary hover:bg-primary-container text-white shadow-primary/20'
-                : 'bg-surface-container-high text-outline cursor-not-allowed'
+            disabled={progress < 100}
+            className={`w-full py-4 px-6 font-bold text-sm md:text-base rounded-2xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+              progress >= 100
+                ? 'bg-primary hover:bg-primary-container text-white cursor-pointer hover:shadow-xl'
+                : 'bg-surface-variant text-outline cursor-not-allowed'
             }`}
           >
-            <span>{t.viewScoredSchemes}</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>{progress >= 100 ? t.viewScoredSchemes : 'Evaluating Policy Matrix...'}</span>
+            {progress >= 100 && <ArrowRight className="w-5 h-5 text-saffron" />}
           </button>
         </div>
 

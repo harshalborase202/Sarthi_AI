@@ -18,7 +18,7 @@ export default function BottomNavbar({ language }) {
       icon: Grid
     },
     {
-      to: '/verify',
+      to: '/documents',
       label: 'Verify',
       icon: ShieldCheck
     },
@@ -35,24 +35,23 @@ export default function BottomNavbar({ language }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 sm:px-4 bg-surface dark:bg-surface-container-low border-t border-outline-variant dark:border-outline shadow-lg rounded-t-2xl">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 sm:px-4 bg-surface dark:bg-surface-container-low border-t border-outline-variant dark:border-outline shadow-lg">
       {navItems.map((item) => {
-        const IconComponent = item.icon;
+        const Icon = item.icon;
         return (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center py-1 px-2 sm:px-3 rounded-xl transition-all active:scale-95 ${
+              `flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'text-primary dark:text-primary-fixed font-extrabold bg-primary/10'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-medium'
+                  ? 'text-primary dark:text-primary-fixed font-bold scale-105'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50'
               }`
             }
           >
-            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 mb-1" />
-            <span className="text-[10px] sm:text-[11px] tracking-tight">{item.label}</span>
+            <Icon className="w-5 h-5" />
+            <span className="text-[11px] leading-none font-medium">{item.label}</span>
           </NavLink>
         );
       })}

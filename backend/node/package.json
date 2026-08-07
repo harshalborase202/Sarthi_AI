@@ -1,0 +1,31 @@
+{
+  "name": "sarthi-ai-node-backend",
+  "version": "1.0.0",
+  "description": "Production-ready Node.js + Express backend for Sarthi AI",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test:health": "node -e \"fetch('http://localhost:4000/health').then(r=>r.json()).then(console.log)\"",
+    "test:key-missing": "GEMINI_API_KEY= node src/server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "chromadb": "^3.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "uuid": "^14.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

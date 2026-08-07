@@ -1,8 +1,30 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { GoogleGenAI } from '@google/genai';
+import fs from 'fs';
+import path from 'path';
 
-function ocrServerPlugin() {
+function getApiKey(mode) {
+  const env = loadEnv(mode, process.cwd(), '');
+  if (env.GEMINI_API_KEY) return env.GEMINI_API_KEY;
+  if (env.VITE_GEMINI_API_KEY) return env.VITE_GEMINI_API_KEY;
+  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+
+  // Fallback: parse root .env directly
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/GEMINI_API_KEY=(.+)/);
+      if (match && match[1].trim()) return match[1].trim();
+    }
+  } catch (err) {
+    console.error('[OCR Plugin] Error reading .env file:', err);
+  }
+  return null;
+}
+
+function ocrServerPlugin(envMode) {
   return {
     name: 'ocr-server-plugin',
     configureServer(server) {
@@ -21,92 +43,67 @@ function ocrServerPlugin() {
             const data = JSON.parse(body);
             const base64Data = data.image ? data.image.replace(/^data:image\/\w+;base64,/, '') : '';
             const mimeType = data.mimeType || 'image/jpeg';
-            const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+            const apiKey = getApiKey(envMode);
 
             if (!apiKey) {
-              // Return structured fallback response if API key is not configured in env
-              const fallbackDocType = data.documentType || 'Aadhaar Card';
-              const mockResult = {
-                success: true,
-                extractedData: {
-                  docType: fallbackDocType,
-                  fullName: "Abhishek Sharma",
-                  identifierNumber: "XXXX-XXXX-4829",
-                  issueDate: "2022-05-14",
-                  address: "Mumbai, Maharashtra, India",
-                  authority: "Unique Identification Authority of India (UIDAI)",
-                  confidenceScore: 0.96,
-                  isMocked: true,
-                  notice: "Server running in fallback mode. Add GEMINI_API_KEY to environment for live Gemini OCR."
-                }
-              };
+              res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');
-              return res.end(JSON.stringify(mockResult));
+              return res.end(JSON.stringify({
+                success: false,
+                error: 'GEMINI_API_KEY is not configured. Add it to your .env file at project root.'
+              }));
             }
 
             // Call Gemini API server-side using GoogleGenAI SDK
             const ai = new GoogleGenAI({ apiKey });
-            const prompt = `You are a specialized OCR parser for Indian Government Documents (Aadhaar, Income Certificate, Domicile, Marksheets, Ration Cards, etc.). 
-Extract structured fields as a valid JSON object only with these exact keys:
-- docType (string e.g. "Aadhaar Card", "Income Certificate", "Domicile Certificate", "12th Marksheet")
-- fullName (string)
-- identifierNumber (string e.g. Aadhaar number, Certificate no, Roll no)
-- issueDate (string e.g. YYYY-MM-DD or DD/MM/YYYY)
-- address (string or null)
-- authority (string e.g. "UIDAI", "Tehsildar Office", "State Board")
-- confidenceScore (number between 0.8 and 0.99)
+            const prompt = `Extract document data from this ${data.documentType || 'government document'}. 
+Return ONLY valid JSON matching this schema:
+{
+  "docType": "Document Name",
+  "fullName": "Full Name",
+  "identifierNumber": "ID Number or Masked ID",
+  "issueDate": "YYYY-MM-DD or null",
+  "address": "Address or null",
+  "authority": "Issuing Authority",
+  "confidenceScore": 0.95
+}`;
 
-Return strictly raw JSON without markdown codeblocks or extra commentary.`;
-
+            const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-flash-latest';
             const response = await ai.models.generateContent({
-              model: 'gemini-2.5-flash',
+              model: modelName,
               contents: [
                 {
-                  role: 'user',
-                  parts: [
-                    { text: prompt },
-                    {
-                      inlineData: {
-                        mimeType: mimeType,
-                        data: base64Data
-                      }
-                    }
-                  ]
-                }
-              ]
+                  inlineData: {
+                    mimeType,
+                    data: base64Data,
+                  },
+                },
+                prompt,
+              ],
             });
 
-            const textOutput = response.text ? response.text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '') : '{}';
-            const parsedData = JSON.parse(textOutput);
+            const text = response.text || '';
+            const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const extractedData = JSON.parse(cleanedText);
 
             res.setHeader('Content-Type', 'application/json');
-            return res.end(JSON.stringify({
-              success: true,
-              extractedData: {
-                ...parsedData,
-                isMocked: false
-              }
-            }));
-
+            res.end(JSON.stringify({ success: true, extractedData }));
           } catch (err) {
-            console.error("OCR API error:", err);
+            console.error('OCR Processing Error:', err);
             res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
-            return res.end(JSON.stringify({
-              success: false,
-              error: err.message || "Failed to process OCR document"
-            }));
+            res.end(JSON.stringify({ success: false, error: err.message }));
           }
         });
       });
-    }
+    },
   };
 }
 
-export default defineConfig({
-  plugins: [react(), ocrServerPlugin()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), ocrServerPlugin(mode)],
   server: {
-    port: 3000,
-    open: true
-  }
-});
+    port: 5173,
+    open: true,
+  },
+}));

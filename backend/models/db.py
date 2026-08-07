@@ -33,25 +33,30 @@ class MemoryItemModel(BaseModel):
     status = CharField(default="until_delete")  # until_delete | 30_days | session_only | never_stored
     data_key = CharField(null=True)
     data_value = TextField(null=True)
-    created_at = DateTimeField(default=datetime.utcnow)
-    updated_at = DateTimeField(default=datetime.utcnow)
+    expiry_date = CharField(null=True)
+    created_at = DateTimeField(default=datetime.now)
+    updated_at = DateTimeField(default=datetime.now)
 
     class Meta:
         table_name = "memory_items"
 
 
-class SessionModel(BaseModel):
-    """Stores user sessions for traceability"""
+class DocumentVerificationModel(BaseModel):
+    """Uploaded/scanned document verification records"""
     id = CharField(primary_key=True)
-    profile_json = TextField()  # JSON string of the submitted profile
-    evaluation_json = TextField()  # JSON string of eligible/ineligible result
-    created_at = DateTimeField(default=datetime.utcnow)
+    doc_type = CharField()
+    full_name = CharField(null=True)
+    identifier_number = CharField(null=True)
+    issue_date = CharField(null=True)
+    authority = CharField(null=True)
+    retention_choice = CharField(default="use_once")
+    confidence_score = CharField(default="0.95")
+    verified_at = DateTimeField(default=datetime.now)
 
     class Meta:
-        table_name = "sessions"
+        table_name = "document_verifications"
 
 
 def init_db():
-    """Create tables if they don't exist."""
-    with db:
-        db.create_tables([MemoryItemModel, SessionModel], safe=True)
+    db.connect(reuse_if_open=True)
+    db.create_tables([MemoryItemModel, DocumentVerificationModel], safe=True)

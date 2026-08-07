@@ -65,7 +65,7 @@ SCHEMES_DATABASE = [
         "allowedCategory": ["sc", "st", "obc", "ews"],
         "allowedOccupation": ["student"],
         "whyQualify": [
-            "Category belongs to SC/ST/OBC/EWS as verified by cast certificate.",
+            "Category belongs to SC/ST/OBC/EWS as verified by caste certificate.",
             "Enrolled in a government-recognized institution in Maharashtra.",
             "Family income is within the state-specified ceiling."
         ],

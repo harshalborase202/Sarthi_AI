@@ -104,7 +104,7 @@ export default function SchemeDetailModal({ scheme, onClose, language }) {
 
           {/* Progress bar */}
           <div className="w-full h-2.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div
+            <div 
               className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
               style={{ width: `${completionPercentage}%` }}
             />
@@ -141,7 +141,7 @@ export default function SchemeDetailModal({ scheme, onClose, language }) {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (onClose) onClose();
-                        navigate(`/verify?doc=${doc.id}`);
+                        navigate(`/documents?doc=${doc.id}`);
                       }}
                       className="py-1 px-2.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1"
                     >

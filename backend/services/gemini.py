@@ -31,7 +31,9 @@ Rules:
 """
 
 
-def get_model(model_name: str = "gemini-2.0-flash") -> genai.GenerativeModel:
+def get_model(model_name: str = None) -> genai.GenerativeModel:
+    if not model_name:
+        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-flash-latest")
     return genai.GenerativeModel(
         model_name=model_name,
         system_instruction=SYSTEM_PROMPT,

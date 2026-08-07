@@ -20,43 +20,53 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
           <div className="flex items-center gap-1.5">
             <span className="text-xl font-bold tracking-tight text-primary dark:text-primary-fixed">{t.appTitle}</span>
             <span 
-              onClick={(e) => { e.stopPropagation(); navigate('/landing'); }}
+              onClick={(e) => { e.stopPropagation(); navigate('/'); }}
               className="bg-saffron/15 hover:bg-saffron/30 text-saffron text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
               title="Click to view Informational Landing Page"
             >
-              <Sparkles className="w-3 h-3" /> BharatAI
+              <Info className="w-3 h-3" /> Info Page
             </span>
           </div>
-          <p className="text-[11px] text-on-surface-variant hidden sm:block">Government Scheme Navigator & Decision Visualizer</p>
+          <p className="text-[11px] text-on-surface-variant hidden sm:block font-medium leading-none mt-0.5">
+            {t.appSubtitle}
+          </p>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        {currentScreen !== 'profile' && (
+        {/* Language Selector Toggle */}
+        <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant text-xs font-semibold">
+          <Globe className="w-4 h-4 text-on-surface-variant ml-1 mr-1.5" />
           <button
-            onClick={() => setScreen('profile')}
-            className="text-xs font-semibold text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20 transition-all hidden sm:block"
+            onClick={() => setLanguage('EN')}
+            className={`px-2.5 py-1 rounded-md transition-all ${
+              language === 'EN'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
           >
-            {t.editProfile}
+            EN
           </button>
-        )}
-
-        {/* Language Switcher Segmented Control */}
-        <div className="flex items-center bg-surface-container-high p-1 rounded-lg border border-outline-variant/60">
-          <Globe className="w-4 h-4 text-outline ml-1 mr-1 hidden sm:block" />
-          {['EN', 'HI', 'MR'].map((lang) => (
-            <button
-              key={lang}
-              onClick={() => setLanguage(lang)}
-              className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
-                language === lang
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-              }`}
-            >
-              {lang === 'EN' ? 'EN' : lang === 'HI' ? 'हिंदी' : 'मराठी'}
-            </button>
-          ))}
+          <button
+            onClick={() => setLanguage('HI')}
+            className={`px-2.5 py-1 rounded-md transition-all ${
+              language === 'HI'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            हिंदी
+          </button>
+          <button
+            onClick={() => setLanguage('MR')}
+            className={`px-2.5 py-1 rounded-md transition-all ${
+              language === 'MR'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            मराठी
+          </button>
         </div>
       </div>
     </header>

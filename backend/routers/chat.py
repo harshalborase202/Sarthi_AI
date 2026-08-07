@@ -15,13 +15,13 @@ async def chat(body: ChatRequest):
     Returns an AI-generated response about government schemes.
     """
     profile_dict = body.profile.model_dump() if body.profile else None
-    history = [h.model_dump() for h in body.history] if body.history else []
-    
+    history_list = [h.model_dump() for h in body.history] if body.history else []
+
     reply = await chat_with_gemini(
         message=body.message,
-        history=history,
+        history=history_list,
         profile=profile_dict,
-        language=body.language,
+        language=body.language
     )
-    
-    return ChatResponse(reply=reply, sources=[])
+
+    return ChatResponse(reply=reply, sources=["Sarthi AI Policy Knowledgebase"])

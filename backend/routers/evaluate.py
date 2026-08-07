@@ -13,11 +13,7 @@ router = APIRouter(prefix="/api", tags=["Evaluate"])
 async def evaluate(profile: UserProfile):
     """
     Evaluates a citizen's profile against all government schemes in the database.
-    Returns:
-    - `eligible`: Schemes the user qualifies for, sorted by match score.
-    - `ineligible`: Schemes the user doesn't qualify for, with exact failure reasons.
+    Returns both eligible schemes (with match scores) and ineligible schemes (with failed criteria audit).
     """
     result = evaluate_profile(profile.model_dump())
-    # Sort eligible by matchScore descending
-    result["eligible"].sort(key=lambda x: x.get("matchScore", 0), reverse=True)
     return result

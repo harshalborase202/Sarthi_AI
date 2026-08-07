@@ -23,22 +23,12 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9; 
+  background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; 
+  background: #cbd5e1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; 
-}
-
-/* Pulse Glow Animation */
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s ease-in-out infinite;
+  background: #94a3b8;
 }

@@ -22,7 +22,7 @@ export default function MemoryCenter({ language }) {
       speechBubble: 'I can remember your age, state, and education level for faster searches next time.',
       status: 'until_delete', // until_delete | 30_days | session_only | never_stored
       expiryDate: null,
-      badgeText: '✅ Remembered until you delete it',
+      badgeText: '✓ Remembered until you delete it',
       badgeStyle: 'bg-emerald-50 text-emerald-800 border-emerald-300'
     },
     {
@@ -92,7 +92,7 @@ export default function MemoryCenter({ language }) {
       let newBadgeStyle = '';
 
       if (newStatus === 'until_delete') {
-        newBadgeText = '✅ Remembered until you delete it';
+        newBadgeText = '✓ Remembered until you delete it';
         newBadgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-300';
       } else if (newStatus === '30_days') {
         newBadgeText = '⏳ Remembered for 30 days — expires 5 Sept 2026';

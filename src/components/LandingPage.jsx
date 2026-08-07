@@ -95,7 +95,7 @@ export default function LandingPage({ language }) {
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => navigate('/get-started')}
-              className="py-2.5 px-5 bg-primary hover:bg-primary-container text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              className="py-2.5 px-5 bg-primary hover:bg-primary-container text-white font-extrabold text-xs rounded-xl shadow-md transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
             >
               <span>Enter SarthiAI</span>
               <ArrowRight className="w-3.5 h-3.5 text-saffron" />

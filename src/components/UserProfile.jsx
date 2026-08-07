@@ -16,7 +16,7 @@ export default function UserProfile({ profile, language, setLanguage }) {
       class10: '10th Passed',
       class12: '12th Passed',
       graduate: 'Undergraduate / B.Tech / Degree',
-      postGraduate: 'Postgraduate / Master\'s'
+      postGraduate: "Postgraduate / Master's"
     };
     return map[val] || val || 'Graduate';
   };

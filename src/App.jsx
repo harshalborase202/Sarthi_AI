@@ -66,143 +66,110 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background text-on-background flex flex-col font-sans">
-      <Header
-        language={language}
+      <Header 
+        language={language} 
         setLanguage={setLanguage}
         onReset={handleReset}
-        currentScreen="active"
-        setScreen={(scr) => {
-          if (scr === 'profile') navigate('/get-started');
-          else if (scr === 'eligible') navigate('/services');
-        }}
       />
 
-      <main className="flex-grow pt-20 pb-24">
+      <main className="flex-1 pb-24 md:pb-8 pt-20">
         <Routes>
-          {/* Root route is the Official Landing Page */}
-          <Route
-            path="/"
+          <Route path="/" element={<LandingPage language={language} />} />
+          <Route 
+            path="/get-started" 
             element={
-              <LandingPage
-                language={language}
-              />
-            }
-          />
-
-          {/* Profile Input onboarding screen moved to /get-started */}
-          <Route
-            path="/get-started"
-            element={
-              <ProfileInput
+              <ProfileInput 
                 profile={profile}
                 setProfile={setProfile}
                 onSubmit={handleProfileSubmit}
                 language={language}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/reasoning"
+          <Route 
+            path="/reasoning" 
             element={
-              <AIReasoningModal
+              <AIReasoningModal 
                 profile={profile}
+                result={evaluationResult}
                 onComplete={handleReasoningComplete}
                 language={language}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/services"
+          <Route 
+            path="/services" 
             element={
-              <EligibleSchemes
-                eligibleList={evaluationResult.eligible}
-                ineligibleList={evaluationResult.ineligible}
+              <EligibleSchemes 
+                eligibleList={evaluationResult?.eligible || []}
+                ineligibleList={evaluationResult?.ineligible || []}
                 profile={profile}
                 onSelectScheme={(scheme) => setSelectedScheme(scheme)}
-                onViewIneligible={() => navigate('/why-not-eligible')}
+                onViewIneligible={() => navigate('/why-not')}
                 onEditProfile={() => navigate('/get-started')}
                 language={language}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/why-not-eligible"
+          <Route 
+            path="/why-not" 
             element={
-              <WhyNotEligible
-                ineligibleList={evaluationResult.ineligible}
-                eligibleList={evaluationResult.eligible}
+              <WhyNotEligible 
+                ineligibleList={evaluationResult?.ineligible || []}
+                eligibleList={evaluationResult?.eligible || []}
                 onBack={() => navigate('/services')}
-                onSelectScheme={(scheme) => setSelectedScheme(scheme)}
+                onSelectScheme={(scheme) => {
+                  setSelectedScheme(scheme);
+                  navigate('/services');
+                }}
                 language={language}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/no-schemes"
+          <Route 
+            path="/no-schemes" 
             element={
-              <NoSchemes
-                onReset={handleReset}
+              <NoSchemes 
+                onReset={() => navigate('/get-started')}
                 language={language}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/verify"
-            element={
-              <DocumentUpload
-                language={language}
-              />
-            }
+          <Route 
+            path="/documents" 
+            element={<DocumentUpload language={language} />} 
           />
-
-          <Route
-            path="/memory"
+          <Route 
+            path="/profile" 
             element={
-              <MemoryCenter
-                language={language}
-              />
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              <UserProfile
+              <UserProfile 
                 profile={profile}
+                setProfile={setProfile}
                 language={language}
-                setLanguage={setLanguage}
               />
-            }
+            } 
           />
-
-          <Route
-            path="/landing"
-            element={
-              <LandingPage
-                language={language}
-              />
-            }
+          <Route 
+            path="/memory" 
+            element={<MemoryCenter language={language} />} 
+          />
+          <Route 
+            path="/settings" 
+            element={<ProfileSettings language={language} />} 
           />
         </Routes>
       </main>
 
-      {/* Bottom Navbar hidden on Landing Page ('/') only, visible on all other routes */}
-      {location.pathname !== '/' && (
-        <BottomNavbar language={language} />
-      )}
-
-      {/* Scheme Detail & Decision Tree Modal */}
       {selectedScheme && (
-        <SchemeDetailModal
+        <SchemeDetailModal 
           scheme={selectedScheme}
           onClose={() => setSelectedScheme(null)}
           language={language}
         />
+      )}
+
+      {location.pathname !== '/' && (
+        <BottomNavbar language={language} />
       )}
     </div>
   );

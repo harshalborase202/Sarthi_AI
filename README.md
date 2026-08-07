@@ -48,20 +48,20 @@
 
 ---
 
-## 📸 User Flow & Screenshots
+## 📐 User Flow & Screenshots
 
 ```
 +-----------------------------------------------------------------------+
 |  User Profile Input  ==>  Live AI Reasoning  ==>  Scored Scheme List  |
-|         │                                                       │     |
-|         ▼                                                       ▼     |
+|        │                                                │             |
+|        ▼                                                ▼             |
 |  Document Checklist  <==  Ineligibility Breakdown <== Interactive Tree|
 +-----------------------------------------------------------------------+
 ```
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## 🏗️ Architecture & Tech Stack
 
 - **Frontend**: React.js / Vite, Tailwind CSS, Framer Motion (micro-animations), Lucide Icons, Recharts / D3.js
 - **Backend / Engine**: FastAPI (Python) or Node.js
