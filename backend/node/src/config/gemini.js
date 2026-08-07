@@ -30,7 +30,8 @@ async function testGeminiConnection() {
       throw new Error('Gemini client not initialized');
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-flash-latest';
+    const model = genAI.getGenerativeModel({ model: modelName });
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
       generationConfig: { maxOutputTokens: 5 },

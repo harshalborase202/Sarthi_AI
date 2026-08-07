@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Grid, ShieldCheck, Brain, User } from 'lucide-react';
+import { Home, Grid, ShieldAlert, Brain, User } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function BottomNavbar({ language }) {
@@ -18,9 +18,9 @@ export default function BottomNavbar({ language }) {
       icon: Grid
     },
     {
-      to: '/documents',
-      label: 'Verify',
-      icon: ShieldCheck
+      to: '/scan-ad',
+      label: 'Scan Ad',
+      icon: ShieldAlert
     },
     {
       to: '/memory',

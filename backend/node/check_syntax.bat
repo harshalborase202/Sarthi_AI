@@ -10,6 +10,8 @@ for %%f in (
   src\utils\logger.js
   src\services\geminiService.js
   src\services\chromaService.js
+  src\controllers\scanController.js
+  src\routes\scan.js
   src\middleware\errorHandler.js
   src\middleware\validateRequest.js
   src\middleware\rateLimiter.js
@@ -29,7 +31,7 @@ for %%f in (
 
 echo.
 if "%FAILED%"=="0" (
-  echo ALL 13 FILES SYNTAX OK - Firebase removed, ChromaDB active
+  echo ALL 15 BACKEND FILES SYNTAX OK
 ) else (
   echo SOME FILES HAVE ERRORS - see above
 )

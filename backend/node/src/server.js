@@ -57,8 +57,10 @@ app.use((req, res, next) => {
 });
 
 // ── 5. Mount routes ───────────────────────────────────────────────────────────
+const scanRouter = require('./routes/scan');
 app.use('/', healthRouter);
 app.use('/api/score', scoreRouter);
+app.use('/api/scan', scanRouter);
 
 // Also mount OCR at /api/ocr-scan to match frontend's direct fetch('/api/ocr-scan')
 const { ocrRateLimiter } = require('./middleware/rateLimiter');

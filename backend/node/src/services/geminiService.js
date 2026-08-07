@@ -242,4 +242,89 @@ async function ocrScanDocument(base64Image, mimeType, documentType) {
   }
 }
 
-module.exports = { generateScoreAndRecommendation, ocrScanDocument };
+/**
+ * Analyzes an advertisement / pamphlet image using Gemini Vision AI.
+ * Extracts text, identifies potential government scheme name, and flags scam indicators.
+ * @param {Buffer} imageBuffer - Raw image buffer
+ * @param {string} mimeType - e.g. 'image/jpeg'
+ * @returns {Promise<object>} Parsed structured JSON result
+ */
+async function analyzeYojanaAd(imageBuffer, mimeType) {
+  const genAI = getGenAI();
+  const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-flash-latest';
+  const model = genAI.getGenerativeModel({ model: modelName });
+
+  const { signal, clearTimer } = makeTimeoutSignal();
+
+  const prompt = `You are a government welfare & consumer protection expert analyzing an advertisement image or pamphlet.
+
+Your task:
+1. Extract ALL visible text from the image (scheme name, amounts, URLs, phone numbers, contact info).
+2. Identify the most likely real Indian government scheme (Yojana) referenced in this ad (e.g. PM-KISAN, PM Surya Ghar, PM Vishwakarma, Ladki Bahin, Ayushman Bharat, PM SVANidhi, PM Vidyalaxmi, etc.). If the image is completely unrelated to government schemes or not an ad, set suggestedSchemeName to null.
+3. Flag common scam / fraudulent indicators if present in the image:
+   - Requests for upfront registration/processing fee or money transfer
+   - Fake urgency / limited-time claims ("Apply in next 24 hours or lose grant")
+   - Non-government website domains (.xyz, .online, .top, bit.ly, free blogspot, etc. instead of .gov.in or .nic.in)
+   - WhatsApp-only or personal mobile number contact
+   - 100% guaranteed approval claims
+   - Spelling variations or distorted logos of official schemes
+
+Return ONLY a JSON object (no markdown, no prose, no code fences):
+{
+  "extractedText": "<full text read from the image>",
+  "suggestedSchemeName": "<likely real Indian scheme name or null if unrelated>",
+  "redFlags": [
+    "<string description of red flag 1 if any>"
+  ],
+  "confidenceReasoning": "<1-2 sentence explanation of why this ad seems genuine or suspicious>"
+}`;
+
+  try {
+    const base64Data = imageBuffer.toString('base64');
+    const result = await model.generateContent(
+      {
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType || 'image/jpeg',
+                  data: base64Data,
+                },
+              },
+              { text: prompt },
+            ],
+          },
+        ],
+        generationConfig: { maxOutputTokens: 1024 },
+      },
+      { signal }
+    );
+
+    clearTimer();
+    const rawText = result.response?.text?.() ?? '';
+    const cleanText = stripMarkdownFences(rawText);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleanText);
+    } catch {
+      throw { httpStatus: 502, error: 'Gemini Vision returned malformed JSON response. Please retry.' };
+    }
+
+    return {
+      extractedText: String(parsed.extractedText || ''),
+      suggestedSchemeName: parsed.suggestedSchemeName ? String(parsed.suggestedSchemeName) : null,
+      redFlags: Array.isArray(parsed.redFlags) ? parsed.redFlags.map(String) : [],
+      confidenceReasoning: String(parsed.confidenceReasoning || ''),
+    };
+  } catch (err) {
+    clearTimer();
+    if (err.httpStatus) throw err;
+    throw classifyGeminiError(err);
+  }
+}
+
+module.exports = { generateScoreAndRecommendation, ocrScanDocument, analyzeYojanaAd };
+

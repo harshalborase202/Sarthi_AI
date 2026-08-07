@@ -9,6 +9,7 @@ import WhyNotEligible from './components/WhyNotEligible';
 import NoSchemes from './components/NoSchemes';
 import BottomNavbar from './components/BottomNavbar';
 import DocumentUpload from './components/DocumentUpload';
+import AdPamphletScanner from './components/AdPamphletScanner';
 import ProfileSettings from './components/ProfileSettings';
 import MemoryCenter from './components/MemoryCenter';
 import UserProfile from './components/UserProfile';
@@ -136,18 +137,12 @@ function AppContent() {
             } 
           />
           <Route 
+            path="/scan-ad" 
+            element={<AdPamphletScanner language={language} />} 
+          />
+          <Route 
             path="/documents" 
-            element={
-              <DocumentUpload 
-                language={language} 
-                profile={profile}
-                setProfile={(updated) => {
-                  setProfile(updated);
-                  const result = evaluateProfile(updated);
-                  setEvaluationResult(result);
-                }}
-              />
-            } 
+            element={<AdPamphletScanner language={language} />} 
           />
           <Route 
             path="/profile" 
