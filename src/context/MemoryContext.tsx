@@ -4,7 +4,7 @@ export type MemoryScope = 'long-term' | 'session';
 
 export interface MemoryItem {
   id: string;
-  category: 'About you' | 'Preferences' | 'Interactions';
+  category: 'About You' | 'Preferences' | 'Scheme Interests';
   fact: string;
   sourceContext: string;
   scope: MemoryScope;
@@ -29,41 +29,83 @@ interface MemoryContextType {
   setHasSeenOnboarding: (val: boolean) => void;
 }
 
+const initialMemories: MemoryItem[] = [
+  {
+    id: 'm1',
+    category: 'About You',
+    fact: 'Small/Marginal Farmer in Maharashtra (Cultivable land: 1.5 Ha)',
+    sourceContext: 'Initial Profile Setup',
+    scope: 'long-term',
+    createdAt: Date.now() - 86400000 * 2
+  },
+  {
+    id: 'm2',
+    category: 'Preferences',
+    fact: 'Prefers Direct Benefit Transfer (DBT) bank accounts',
+    sourceContext: 'Scheme Filtering',
+    scope: 'long-term',
+    createdAt: Date.now() - 86400000
+  },
+  {
+    id: 'm3',
+    category: 'Scheme Interests',
+    fact: 'Queried about Ayushman Bharat PM-JAY health card',
+    sourceContext: 'Chat Conversation',
+    scope: 'session',
+    createdAt: Date.now() - 3600000
+  }
+];
+
+const initialLogs: ActivityLog[] = [
+  {
+    id: 'l1',
+    action: 'Added',
+    description: 'Added: Small/Marginal Farmer profile (Long-term)',
+    timestamp: Date.now() - 86400000 * 2
+  },
+  {
+    id: 'l2',
+    action: 'Added',
+    description: 'Added: DBT Bank account preference (Long-term)',
+    timestamp: Date.now() - 86400000
+  },
+  {
+    id: 'l3',
+    action: 'Added',
+    description: 'Added: Health Card interest (Session)',
+    timestamp: Date.now() - 3600000
+  }
+];
+
 const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
 
 export const MemoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [memories, setMemories] = useState<MemoryItem[]>(() => {
-    const saved = localStorage.getItem('sathiai_memories');
-    return saved ? JSON.parse(saved) : [];
+    const saved = localStorage.getItem('sarkarsaathi_memories');
+    return saved ? JSON.parse(saved) : initialMemories;
   });
 
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(() => {
-    const saved = localStorage.getItem('sathiai_activity_logs');
-    return saved ? JSON.parse(saved) : [];
+    const saved = localStorage.getItem('sarkarsaathi_logs');
+    return saved ? JSON.parse(saved) : initialLogs;
   });
 
   const [hasSeenOnboarding, setHasSeenOnboardingState] = useState<boolean>(() => {
-    return localStorage.getItem('sathiai_onboarding_seen') === 'true';
+    return localStorage.getItem('sarkarsaathi_onboarding') === 'true';
   });
 
-  // Session memories are cleared on reload, so we filter them out when saving/loading if we wanted to be strict.
-  // For demo purposes, we'll keep them in state but they represent "session" conceptually.
-  // Real implementation might use sessionStorage for 'session' scope. 
-  // Here, we'll just filter them out from localStorage persistence to truly make them session-bound.
-  
   useEffect(() => {
-    const longTermMemories = memories.filter(m => m.scope === 'long-term');
-    localStorage.setItem('sathiai_memories', JSON.stringify(longTermMemories));
+    localStorage.setItem('sarkarsaathi_memories', JSON.stringify(memories));
   }, [memories]);
 
   useEffect(() => {
-    localStorage.setItem('sathiai_activity_logs', JSON.stringify(activityLogs));
+    localStorage.setItem('sarkarsaathi_logs', JSON.stringify(activityLogs));
   }, [activityLogs]);
 
   const setHasSeenOnboarding = (val: boolean) => {
     setHasSeenOnboardingState(val);
-    localStorage.setItem('sathiai_onboarding_seen', String(val));
-  }
+    localStorage.setItem('sarkarsaathi_onboarding', String(val));
+  };
 
   const logActivity = (action: ActivityLog['action'], description: string) => {
     const newLog: ActivityLog = {
@@ -81,14 +123,14 @@ export const MemoryProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       id: Math.random().toString(36).substring(7),
       createdAt: Date.now()
     };
-    setMemories(prev => [...prev, newMemory]);
-    logActivity('Added', `Memory added: ${memoryData.fact} (${memoryData.scope})`);
+    setMemories(prev => [newMemory, ...prev]);
+    logActivity('Added', `Added: ${memoryData.fact} (${memoryData.scope})`);
   };
 
   const updateMemoryScope = (id: string, scope: MemoryScope) => {
     setMemories(prev => prev.map(m => {
       if (m.id === id) {
-        logActivity('Scope Changed', `Scope changed to ${scope} for: ${m.fact}`);
+        logActivity('Scope Changed', `Changed scope to ${scope} for: "${m.fact}"`);
         return { ...m, scope };
       }
       return m;
@@ -96,15 +138,15 @@ export const MemoryProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   const forgetMemory = (id: string) => {
-    const memory = memories.find(m => m.id === id);
-    if (memory) {
-      logActivity('Forgotten', `Forgotten: ${memory.fact}`);
+    const target = memories.find(m => m.id === id);
+    if (target) {
+      logActivity('Forgotten', `Forgotten: "${target.fact}"`);
       setMemories(prev => prev.filter(m => m.id !== id));
     }
   };
 
   const clearAllMemories = () => {
-    logActivity('Forgotten', 'All memory cleared by user');
+    logActivity('Forgotten', 'Cleared all memories');
     setMemories([]);
   };
 
@@ -126,6 +168,6 @@ export const MemoryProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
 export const useMemory = () => {
   const context = useContext(MemoryContext);
-  if (!context) throw new Error('useMemory must be used within a MemoryProvider');
+  if (!context) throw new Error('useMemory must be used within MemoryProvider');
   return context;
 };

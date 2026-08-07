@@ -28,7 +28,7 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({ onComplete }) => {
       const alreadyRemembered = memories.some(m => m.fact.includes('Maharashtra'));
       if (!alreadyRemembered) {
         triggerMemoryConsent({
-          category: 'About you',
+          category: 'About You',
           fact: 'Lives in Maharashtra',
           sourceContext: 'Profile Setup'
         });
