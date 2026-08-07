@@ -256,27 +256,41 @@ async function analyzeYojanaAd(imageBuffer, mimeType) {
 
   const { signal, clearTimer } = makeTimeoutSignal();
 
-  const prompt = `You are a government welfare & consumer protection expert analyzing an advertisement image or pamphlet.
+  const prompt = `You are an expert on Indian government welfare schemes analyzing an advertisement or pamphlet image.
+
+The image may contain text in Hindi, Marathi, English, or other regional languages. Read ALL text carefully regardless of language.
 
 Your task:
-1. Extract ALL visible text from the image (scheme name, amounts, URLs, phone numbers, contact info).
-2. Identify the most likely real Indian government scheme (Yojana) referenced in this ad (e.g. PM-KISAN, PM Surya Ghar, PM Vishwakarma, Ladki Bahin, Ayushman Bharat, PM SVANidhi, PM Vidyalaxmi, etc.). If the image is completely unrelated to government schemes or not an ad, set suggestedSchemeName to null.
-3. Flag common scam / fraudulent indicators if present in the image:
-   - Requests for upfront registration/processing fee or money transfer
-   - Fake urgency / limited-time claims ("Apply in next 24 hours or lose grant")
-   - Non-government website domains (.xyz, .online, .top, bit.ly, free blogspot, etc. instead of .gov.in or .nic.in)
-   - WhatsApp-only or personal mobile number contact
-   - 100% guaranteed approval claims
-   - Spelling variations or distorted logos of official schemes
+1. Extract ALL visible text from the image verbatim (scheme name, amounts, URLs, phone numbers).
+2. Identify the EXACT Indian government scheme shown. Map what you see to the canonical English scheme name.
 
-Return ONLY a JSON object (no markdown, no prose, no code fences):
+Known schemes and their common names/aliases (match even if text is in Hindi/Marathi):
+- "Mukhyamantri Majhi Ladki Bahin Yojana" → if you see: माझी लाडकी बहीण, लाडकी बहीण योजना, ladki bahin, ₹1500 महिला
+- "PM-KISAN Samman Nidhi" → if you see: पीएम किसान, किसान सम्मान, PM KISAN, ₹6000 farmer
+- "Ayushman Bharat PM-JAY" → if you see: आयुष्मान भारत, ayushman, health card 5 lakh
+- "PM Vishwakarma Yojana" → if you see: विश्वकर्मा, PM Vishwakarma, artisan loan
+- "PM Surya Ghar Muft Bijli Yojana" → if you see: सूर्य घर, solar subsidy, free electricity, muft bijli
+- "PM SVANidhi Scheme" → if you see: स्वनिधि, street vendor loan, svanidhi
+- "PM Vidyalaxmi Scheme" → if you see: विद्यालक्ष्मी, education loan
+- "Maharashtra Post-Matric Scholarship" → if you see: mahadbt, post matric scholarship, महाडीबीटी
+- "AICTE Pragati Scholarship for Girls" → if you see: pragati scholarship, aicte girls
+
+If none of the above, use your best judgment to identify the scheme name in English. Set to null ONLY if the image is clearly NOT about a government scheme.
+
+3. Flag scam indicators if present:
+   - Upfront fee or money transfer requests
+   - Fake urgency ("apply in 24 hours or lose grant")
+   - Non-government domains (.xyz, .online, bit.ly instead of .gov.in or .nic.in)
+   - WhatsApp-only or personal mobile contact
+   - Guaranteed approval claims
+   - Distorted/misspelled official scheme names or logos
+
+Return ONLY valid JSON (no markdown, no prose, no code fences):
 {
-  "extractedText": "<full text read from the image>",
-  "suggestedSchemeName": "<likely real Indian scheme name or null if unrelated>",
-  "redFlags": [
-    "<string description of red flag 1 if any>"
-  ],
-  "confidenceReasoning": "<1-2 sentence explanation of why this ad seems genuine or suspicious>"
+  "extractedText": "<all visible text from the image verbatim>",
+  "suggestedSchemeName": "<exact canonical English scheme name from the list above, or null>",
+  "redFlags": ["<red flag description if any>"],
+  "confidenceReasoning": "<1-2 sentences: what text/visuals led you to this scheme identification>"
 }`;
 
   try {

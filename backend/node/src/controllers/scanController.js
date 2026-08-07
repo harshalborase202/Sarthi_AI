@@ -23,72 +23,93 @@ const VERIFIED_SCHEMES = [
     name: "PM Vidyalaxmi Scheme",
     officialUrl: "https://pmvidyalaxmi.ac.in/",
     shortDescription: "Collateral-free educational loans up to ₹7.5 Lakhs with 3% interest subvention for meritorious students.",
-    keywords: ["vidyalaxmi", "vidya lakshmi", "education loan", "interest subvention", "higher education"]
+    keywords: ["vidyalaxmi", "vidya lakshmi", "education loan", "interest subvention", "higher education", "विद्यालक्ष्मी", "शिक्षण कर्ज"]
   },
   {
     id: "mh-post-matric",
     name: "Maharashtra Post-Matric Scholarship",
     officialUrl: "https://mahadbt.maharashtra.gov.in/",
     shortDescription: "Tuition fee waiver and monthly allowance for SC/ST/OBC/EWS students in Maharashtra.",
-    keywords: ["mahadbt", "post matric", "maharashtra scholarship", "caste scholarship"]
+    keywords: ["mahadbt", "post matric", "maharashtra scholarship", "caste scholarship", "महाडीबीटी", "पोस्ट मॅट्रिक", "शिष्यवृत्ती"]
   },
   {
     id: "aicte-pragati",
     name: "AICTE Pragati Scholarship for Girls",
     officialUrl: "https://scholarships.gov.in/",
     shortDescription: "Scholarship of ₹50,000 per annum for female technical degree/diploma students.",
-    keywords: ["aicte", "pragati", "girl scholarship", "technical education", "female student"]
+    keywords: ["aicte", "pragati", "girl scholarship", "technical education", "female student", "प्रगती", "मुलींसाठी शिष्यवृत्ती"]
   },
   {
     id: "pm-kisan",
     name: "PM-KISAN Samman Nidhi",
     officialUrl: "https://pmkisan.gov.in/",
     shortDescription: "Direct income support of ₹6,000 per year in 3 equal installments to landholding farmer families.",
-    keywords: ["pm kisan", "kisan samman", "farmer 6000", "agriculture dbt", "kisan nidhi"]
+    keywords: ["pm kisan", "kisan samman", "farmer 6000", "agriculture dbt", "kisan nidhi", "पंतप्रधान किसान", "किसान सन्मान निधी"]
   },
   {
     id: "pm-svanidhi",
     name: "PM SVANidhi Scheme",
     officialUrl: "https://pmsvanidhi.mohua.gov.in/",
     shortDescription: "Collateral-free working capital loan up to ₹50,000 for street vendors and micro-entrepreneurs.",
-    keywords: ["svanidhi", "street vendor loan", "vendor credit", "collateral free loan"]
+    keywords: ["svanidhi", "street vendor loan", "vendor credit", "collateral free loan", "स्वनिधी", "पथविक्रेता कर्ज"]
   },
   {
     id: "ladki-bahin",
     name: "Mukhyamantri Majhi Ladki Bahin Yojana",
     officialUrl: "https://ladkibahin.maharashtra.gov.in/",
     shortDescription: "Monthly financial assistance of ₹1,500 directly transferred to eligible women in Maharashtra aged 21 to 65.",
-    keywords: ["ladki bahin", "majhi ladki bahin", "maharashtra women 1500", "ladki bahin yojana"]
+    keywords: ["ladki bahin", "majhi ladki bahin", "maharashtra women 1500", "ladki bahin yojana", "लाडकी बहीण", "माझी लाडकी बहीण"]
   },
   {
     id: "pm-vishwakarma",
     name: "PM Vishwakarma Yojana",
     officialUrl: "https://pmvishwakarma.gov.in/",
     shortDescription: "₹15,000 toolkit grant + ₹3.0 Lakh collateral-free loan @ 5% interest for traditional artisans & craftspeople.",
-    keywords: ["vishwakarma", "artisan loan", "craftsman toolkit", "traditional trades", "vishwakarma yojana"]
+    keywords: ["vishwakarma", "artisan loan", "craftsman toolkit", "traditional trades", "vishwakarma yojana", "विश्वकर्मा", "कारागीर योजना"]
   },
   {
     id: "pm-surya-ghar",
     name: "PM Surya Ghar: Muft Bijli Yojana",
     officialUrl: "https://pmsuryaghar.gov.in/",
     shortDescription: "Rooftop solar installation subsidy up to ₹78,000 providing up to 300 units of free monthly electricity.",
-    keywords: ["surya ghar", "muft bijli", "rooftop solar subsidy", "free electricity 300 units", "solar yojana"]
+    keywords: ["surya ghar", "muft bijli", "rooftop solar subsidy", "free electricity 300 units", "solar yojana", "सूर्य घर", "मोफत वीज"]
   },
   {
     id: "ayushman-bharat",
     name: "Ayushman Bharat PM-JAY",
     officialUrl: "https://pmjay.gov.in/",
     shortDescription: "Cashless health insurance coverage up to ₹5.0 Lakhs per family per year for hospital treatment.",
-    keywords: ["ayushman", "pmjay", "health card 5 lakh", "cashless treatment", "ayushman bharat"]
+    keywords: ["ayushman", "pmjay", "health card 5 lakh", "cashless treatment", "ayushman bharat", "आयुष्मान भारत", "आरोग्य कार्ड"]
   }
 ];
 
-// Configure Fuse.js for fuzzy string matching
+// Configure Fuse.js for fuzzy string matching on suggestedSchemeName only
+// Keep threshold tight (0.4) — we only feed Gemini's clean scheme name, not raw OCR text
 const fuse = new Fuse(VERIFIED_SCHEMES, {
-  keys: ['name', 'id', 'keywords', 'shortDescription'],
-  threshold: 0.45, // 0.0 = exact, 1.0 = match anything
+  keys: ['name', 'id', 'keywords'],
+  threshold: 0.4,
   includeScore: true,
 });
+
+/**
+ * Direct keyword scan — checks if any of a scheme's specific keywords
+ * appear as a substring in the given text.
+ * IMPORTANT: Only call this with Gemini's suggestedSchemeName or confidenceReasoning —
+ * NEVER with raw extractedText (too noisy, causes false positives).
+ */
+function directKeywordMatch(text) {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const scheme of VERIFIED_SCHEMES) {
+    for (const kw of scheme.keywords) {
+      // Match keyword as substring (supports Devanagari via exact Unicode match)
+      if (lower.includes(kw.toLowerCase()) || text.includes(kw)) {
+        return scheme;
+      }
+    }
+  }
+  return null;
+}
 
 /**
  * Validate image buffer using magic bytes (header signature inspection)
@@ -145,30 +166,55 @@ async function scanYojanaAd(req, res, next) {
     // 4. Send image to Gemini Vision AI
     const analysis = await analyzeYojanaAd(buffer, detectedMimeType);
 
-    // 5. Fuzzy match Gemini's extracted scheme name/text against verified database
-    const searchText = `${analysis.suggestedSchemeName || ''} ${analysis.extractedText || ''}`.trim();
-    const fuseResults = fuse.search(searchText);
+    // 5. Match Gemini's identified scheme name against the verified database.
+    //
+    // STRATEGY: Only use Gemini's `suggestedSchemeName` + `confidenceReasoning` for matching.
+    // NEVER use raw `extractedText` — it contains noisy OCR text (e.g. 'Maharashtra', 'महिला')
+    // that would cause false positives across schemes.
+    //
+    // Gemini already does the hard work of scheme identification — we just need to
+    // verify its answer against our database.
+    const geminiSchemeHint = [
+      analysis.suggestedSchemeName || '',
+      analysis.confidenceReasoning || '',
+    ].join(' ').trim();
 
     let matchFound = false;
     let confidence = 'low';
     let matchedScheme = null;
 
-    if (fuseResults.length > 0) {
-      const bestMatch = fuseResults[0];
-      // Fuse score: lower is better (0.0 = perfect match)
-      if (bestMatch.score <= 0.45) {
-        matchFound = true;
-        matchedScheme = {
-          id: bestMatch.item.id,
-          name: bestMatch.item.name,
-          officialUrl: bestMatch.item.officialUrl,
-          shortDescription: bestMatch.item.shortDescription,
-        };
+    logger.info({ suggestedSchemeName: analysis.suggestedSchemeName, hint: geminiSchemeHint.slice(0, 120) }, '[ScanController] Gemini scheme hint for matching');
 
-        if (bestMatch.score <= 0.25 && analysis.redFlags.length === 0) {
-          confidence = 'high';
-        } else {
-          confidence = 'medium';
+    // Pass 1: Direct keyword/substring scan on Gemini's scheme name (handles Devanagari)
+    const directMatch = directKeywordMatch(geminiSchemeHint);
+    if (directMatch) {
+      matchFound = true;
+      matchedScheme = {
+        id: directMatch.id,
+        name: directMatch.name,
+        officialUrl: directMatch.officialUrl,
+        shortDescription: directMatch.shortDescription,
+      };
+      confidence = analysis.redFlags.length === 0 ? 'high' : 'medium';
+      logger.info({ schemeId: directMatch.id }, '[ScanController] Matched via direct keyword scan on suggestedSchemeName');
+    }
+
+    // Pass 2: Fuse.js fuzzy match on Gemini's scheme name (handles partial/misspelled English)
+    if (!matchFound && geminiSchemeHint) {
+      const fuseResults = fuse.search(geminiSchemeHint);
+      if (fuseResults.length > 0) {
+        const bestMatch = fuseResults[0];
+        // Fuse score: lower is better (0.0 = perfect match)
+        if (bestMatch.score <= 0.4) {
+          matchFound = true;
+          matchedScheme = {
+            id: bestMatch.item.id,
+            name: bestMatch.item.name,
+            officialUrl: bestMatch.item.officialUrl,
+            shortDescription: bestMatch.item.shortDescription,
+          };
+          confidence = bestMatch.score <= 0.25 && analysis.redFlags.length === 0 ? 'high' : 'medium';
+          logger.info({ schemeId: bestMatch.item.id, score: bestMatch.score }, '[ScanController] Matched via Fuse on suggestedSchemeName');
         }
       }
     }
