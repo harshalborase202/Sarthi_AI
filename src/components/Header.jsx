@@ -1,8 +1,10 @@
 import React from 'react';
-import { ShieldCheck, Globe, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShieldCheck, Globe, Sparkles, Info } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function Header({ language, setLanguage, onReset, currentScreen, setScreen }) {
+  const navigate = useNavigate();
   const t = translations[language] || translations.EN;
 
   return (
@@ -17,7 +19,11 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
         <div>
           <div className="flex items-center gap-1.5">
             <span className="text-xl font-bold tracking-tight text-primary dark:text-primary-fixed">{t.appTitle}</span>
-            <span className="bg-saffron/15 text-saffron text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+            <span 
+              onClick={(e) => { e.stopPropagation(); navigate('/landing'); }}
+              className="bg-saffron/15 hover:bg-saffron/30 text-saffron text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors"
+              title="Click to view Informational Landing Page"
+            >
               <Sparkles className="w-3 h-3" /> BharatAI
             </span>
           </div>

@@ -8,7 +8,7 @@ export default function BottomNavbar({ language }) {
 
   const navItems = [
     {
-      to: '/',
+      to: '/get-started',
       label: 'Home',
       icon: Home
     },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import ProfileInput from './components/ProfileInput';
 import AIReasoningModal from './components/AIReasoningModal';
@@ -12,10 +12,12 @@ import DocumentUpload from './components/DocumentUpload';
 import ProfileSettings from './components/ProfileSettings';
 import MemoryCenter from './components/MemoryCenter';
 import UserProfile from './components/UserProfile';
+import LandingPage from './components/LandingPage';
 import { evaluateProfile } from './data/schemes';
 
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [language, setLanguage] = useState('EN');
 
   // Pre-filled defaults matching demo script in README
@@ -59,7 +61,7 @@ function AppContent() {
 
   const handleReset = () => {
     setSelectedScheme(null);
-    navigate('/');
+    navigate('/get-started');
   };
 
   return (
@@ -70,15 +72,26 @@ function AppContent() {
         onReset={handleReset}
         currentScreen="active"
         setScreen={(scr) => {
-          if (scr === 'profile') navigate('/');
+          if (scr === 'profile') navigate('/get-started');
           else if (scr === 'eligible') navigate('/services');
         }}
       />
 
       <main className="flex-grow pt-20 pb-24">
         <Routes>
+          {/* Root route is the Official Landing Page */}
           <Route
             path="/"
+            element={
+              <LandingPage
+                language={language}
+              />
+            }
+          />
+
+          {/* Profile Input onboarding screen moved to /get-started */}
+          <Route
+            path="/get-started"
             element={
               <ProfileInput
                 profile={profile}
@@ -109,7 +122,7 @@ function AppContent() {
                 profile={profile}
                 onSelectScheme={(scheme) => setSelectedScheme(scheme)}
                 onViewIneligible={() => navigate('/why-not-eligible')}
-                onEditProfile={() => navigate('/')}
+                onEditProfile={() => navigate('/get-started')}
                 language={language}
               />
             }
@@ -166,11 +179,22 @@ function AppContent() {
               />
             }
           />
+
+          <Route
+            path="/landing"
+            element={
+              <LandingPage
+                language={language}
+              />
+            }
+          />
         </Routes>
       </main>
 
-      {/* Persistent Bottom Navigation Bar */}
-      <BottomNavbar language={language} />
+      {/* Bottom Navbar hidden on Landing Page ('/') only, visible on all other routes */}
+      {location.pathname !== '/' && (
+        <BottomNavbar language={language} />
+      )}
 
       {/* Scheme Detail & Decision Tree Modal */}
       {selectedScheme && (
