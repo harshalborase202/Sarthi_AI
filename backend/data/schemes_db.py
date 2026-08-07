@@ -237,80 +237,106 @@ SCHEMES_DATABASE = [
         }
     },
     {
-        "id": "nsp-scholarship",
-        "name": "NSP Merit-cum-Means Scholarship",
+        "id": "pm-vishwakarma",
+        "name": "PM Vishwakarma Yojana",
         "govtLevel": "Central Government",
-        "ministry": "Ministry of Minority Affairs",
-        "category": "Education & Scholarship",
-        "shortDesc": "Scholarship for minority community students pursuing professional and technical courses at undergraduate/postgraduate level.",
-        "badge": "88% Match",
-        "officialUrl": "https://scholarships.gov.in/",
-        "targetGroup": "Minority Community Students",
-        "benefitAmount": "Up to ₹20,000/year (course fee + maintenance)",
-        "maxIncome": 250000,
-        "minAge": 17,
-        "maxAge": 32,
-        "allowedStates": ["All"],
-        "allowedEducation": ["graduate", "postGraduate"],
-        "allowedGender": ["male", "female", "other"],
-        "allowedCategory": ["obc", "general"],
-        "allowedOccupation": ["student"],
-        "whyQualify": [
-            "Belongs to a minority community (Muslim, Christian, Sikh, Buddhist, Jain, Zoroastrian).",
-            "Enrolled in professional/technical degree program.",
-            "Scored 50%+ in last qualifying exam."
-        ],
-        "documents": [
-            {"id": "aadhaar", "name": "Aadhaar Card", "required": True},
-            {"id": "minority_cert", "name": "Minority Community Certificate", "required": True},
-            {"id": "income_cert", "name": "Income Certificate", "required": True},
-            {"id": "marksheet", "name": "Previous Qualifying Exam Marksheet (50%+)", "required": True}
-        ],
-        "decisionTree": {
-            "nodes": [
-                {"id": "node1", "label": "Minority Status", "status": "pass", "detail": "Verified Community Certificate"},
-                {"id": "node2", "label": "Academic Merit", "status": "pass", "detail": "50%+ in qualifying exam"},
-                {"id": "node3", "label": "Income Check", "status": "pass", "detail": "Family income ≤ ₹2.5 Lakhs"},
-                {"id": "node4", "label": "Professional Course", "status": "pass", "detail": "Technical Degree Program"}
-            ]
-        }
-    },
-    {
-        "id": "pmegp",
-        "name": "Prime Minister's Employment Generation Programme (PMEGP)",
-        "govtLevel": "Central Government",
-        "ministry": "Ministry of MSME (via KVIC)",
-        "category": "Entrepreneurship & Self-Employment",
-        "shortDesc": "Subsidy of 15-35% on project cost up to ₹25 Lakhs for new micro-enterprises in manufacturing or service sector.",
-        "badge": "80% Match",
-        "officialUrl": "https://www.kviconline.gov.in/pmegpeportal/",
-        "targetGroup": "Aspiring Micro-Entrepreneurs (18+ years)",
-        "benefitAmount": "15–35% subsidy on project cost (up to ₹25L)",
-        "maxIncome": 1000000,
+        "ministry": "Ministry of Micro, Small and Medium Enterprises",
+        "category": "Artisan & Traditional Crafts",
+        "shortDesc": "End-to-end support for traditional artisans and craftspeople including ₹15,000 toolkit incentive, skill training, and collateral-free loan up to ₹3.0 Lakhs at 5% interest.",
+        "badge": "94% Match",
+        "officialUrl": "https://pmvishwakarma.gov.in/",
+        "targetGroup": "Traditional Artisans & Craftspeople",
+        "benefitAmount": "₹15,000 Toolkit Grant + ₹3.0 Lakh Collateral-Free Loan @ 5%",
+        "maxIncome": 500000,
         "minAge": 18,
-        "maxAge": 55,
+        "maxAge": 65,
         "allowedStates": ["All"],
-        "allowedEducation": ["class8", "below10th", "class10", "class12", "graduate", "postGraduate"],
+        "allowedEducation": ["below10th", "class10", "class12", "graduate", "postGraduate"],
         "allowedGender": ["male", "female", "other"],
         "allowedCategory": ["general", "obc", "sc", "st", "ews"],
         "allowedOccupation": ["selfEmployed", "unemployed"],
         "whyQualify": [
-            "Minimum 8th class pass for projects above ₹10 Lakhs.",
-            "EDP training completed or arranged through KVIC/KVIB.",
-            "Special preference for SC/ST/OBC/women/ex-servicemen."
+            "Engaged in one of 18 traditional family-based trades.",
+            "Age is 18 years or above.",
+            "Has not availed loan under PMEGP or MUDRA in past 5 years."
         ],
         "documents": [
             {"id": "aadhaar", "name": "Aadhaar Card", "required": True},
-            {"id": "project_report", "name": "Detailed Project Report (DPR)", "required": True},
-            {"id": "education_cert", "name": "Educational Qualification Certificate", "required": True},
-            {"id": "bank", "name": "Bank Account for Loan Disbursement", "required": True}
+            {"id": "bank", "name": "Aadhaar Linked Bank Passbook", "required": True}
         ],
         "decisionTree": {
             "nodes": [
-                {"id": "node1", "label": "Age Eligibility", "status": "pass", "detail": "18–55 years"},
-                {"id": "node2", "label": "Education Check", "status": "pass", "detail": "Min. 8th class pass"},
-                {"id": "node3", "label": "Project Viability", "status": "pass", "detail": "DPR approved by KVIC"},
-                {"id": "node4", "label": "Subsidy Sanctioned", "status": "pass", "detail": "15-35% of project cost"}
+                {"id": "node1", "label": "Trade Verification", "status": "pass", "detail": "Verified in 18 Traditional Crafts"},
+                {"id": "node2", "label": "Skill Assessment", "status": "pass", "detail": "Basic 5-day Training Completed"},
+                {"id": "node3", "label": "Toolkit Incentive", "status": "pass", "detail": "₹15,000 e-Voucher Issued"}
+            ]
+        }
+    },
+    {
+        "id": "pm-surya-ghar",
+        "name": "PM Surya Ghar: Muft Bijli Yojana",
+        "govtLevel": "Central Government",
+        "ministry": "Ministry of New and Renewable Energy",
+        "category": "Clean Energy & Renewable Subsidy",
+        "shortDesc": "Roof-top solar installation subsidy up to ₹78,000 to provide up to 300 units of free electricity every month for eligible residential households.",
+        "badge": "91% Match",
+        "officialUrl": "https://pmsuryaghar.gov.in/",
+        "targetGroup": "Residential Households",
+        "benefitAmount": "Up to ₹78,000 Rooftop Solar Subsidy + Free Electricity",
+        "maxIncome": 1000000,
+        "minAge": 18,
+        "maxAge": 80,
+        "allowedStates": ["All"],
+        "allowedEducation": ["below10th", "class10", "class12", "graduate", "postGraduate"],
+        "allowedGender": ["male", "female", "other"],
+        "allowedCategory": ["general", "obc", "sc", "st", "ews"],
+        "allowedOccupation": ["salaried", "selfEmployed", "farmer", "unemployed", "student"],
+        "whyQualify": [
+            "Residential household with suitable roof space for solar panels.",
+            "Valid DISCOM electricity connection in applicant's name."
+        ],
+        "documents": [
+            {"id": "electricity_bill", "name": "Latest DISCOM Electricity Bill", "required": True},
+            {"id": "aadhaar", "name": "Aadhaar Card", "required": True}
+        ],
+        "decisionTree": {
+            "nodes": [
+                {"id": "node1", "label": "Household Check", "status": "pass", "detail": "Residential Electricity Meter"},
+                {"id": "node2", "label": "Subsidy Transfer", "status": "pass", "detail": "Up to ₹78,000 Credited via DBT"}
+            ]
+        }
+    },
+    {
+        "id": "ayushman-bharat",
+        "name": "Ayushman Bharat PM-JAY",
+        "govtLevel": "Central Government",
+        "ministry": "Ministry of Health and Family Welfare",
+        "category": "Healthcare & Insurance",
+        "shortDesc": "World's largest health assurance scheme providing cashless health coverage up to ₹5.0 Lakhs per family per year for secondary and tertiary hospital care.",
+        "badge": "97% Match",
+        "officialUrl": "https://pmjay.gov.in/",
+        "targetGroup": "Low-Income Families & Senior Citizens (70+)",
+        "benefitAmount": "₹5,00,000 per year Cashless Hospitalization Coverage",
+        "maxIncome": 300000,
+        "minAge": 0,
+        "maxAge": 100,
+        "allowedStates": ["All"],
+        "allowedEducation": ["below10th", "class10", "class12", "graduate", "postGraduate"],
+        "allowedGender": ["male", "female", "other"],
+        "allowedCategory": ["general", "obc", "sc", "st", "ews"],
+        "allowedOccupation": ["salaried", "selfEmployed", "farmer", "unemployed", "student"],
+        "whyQualify": [
+            "SECC 2011 vulnerable family classification or senior citizen aged 70+.",
+            "Cashless treatment at over 29,000 empanelled public and private hospitals across India."
+        ],
+        "documents": [
+            {"id": "aadhaar", "name": "Aadhaar Card", "required": True},
+            {"id": "ration_card", "name": "Family Ration Card / Ayushman Card", "required": True}
+        ],
+        "decisionTree": {
+            "nodes": [
+                {"id": "node1", "label": "Family Eligibility", "status": "pass", "detail": "SECC Listed / Senior Citizen 70+"},
+                {"id": "node2", "label": "Hospitalization", "status": "pass", "detail": "Cashless Treatment up to ₹5 Lakhs"}
             ]
         }
     }

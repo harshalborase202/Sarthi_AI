@@ -137,7 +137,17 @@ function AppContent() {
           />
           <Route 
             path="/documents" 
-            element={<DocumentUpload language={language} />} 
+            element={
+              <DocumentUpload 
+                language={language} 
+                profile={profile}
+                setProfile={(updated) => {
+                  setProfile(updated);
+                  const result = evaluateProfile(updated);
+                  setEvaluationResult(result);
+                }}
+              />
+            } 
           />
           <Route 
             path="/profile" 

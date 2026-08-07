@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Upload, Camera, FileCheck, ShieldCheck, AlertCircle, Loader2, CheckCircle2, Lock, Sparkles, Trash2, ArrowRight } from 'lucide-react';
 import { translations } from '../data/translations';
 
-export default function DocumentUpload({ language }) {
+export default function DocumentUpload({ language, profile, setProfile }) {
   const t = translations[language] || translations.EN;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function DocumentUpload({ language }) {
   const [consentChoice, setConsentChoice] = useState(null);
   const [savedSuccessNotice, setSavedSuccessNotice] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [appliedToProfileNotice, setAppliedToProfileNotice] = useState(false);
 
   useEffect(() => {
     if (docIdParam) {
@@ -44,6 +45,7 @@ export default function DocumentUpload({ language }) {
     setExtractedData(null);
     setConsentChoice(null);
     setSavedSuccessNotice(null);
+    setAppliedToProfileNotice(false);
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -88,11 +90,34 @@ export default function DocumentUpload({ language }) {
     }
   };
 
+  // Apply extracted fields directly to user profile
+  const handleApplyToProfile = () => {
+    if (!extractedData) return;
+
+    const updatedProfile = { ...(profile || {}) };
+    if (extractedData.fullName) updatedProfile.fullName = extractedData.fullName;
+    if (extractedData.address) {
+      const stateMatch = extractedData.address.match(/(Maharashtra|Delhi|Gujarat|Karnataka|Tamil Nadu|Uttar Pradesh|Punjab|Rajasthan|West Bengal|Bihar|Kerala|Madhya Pradesh)/i);
+      if (stateMatch) updatedProfile.state = stateMatch[1];
+    }
+    if (extractedData.income) {
+      const incomeNum = extractedData.income.replace(/[^0-9]/g, '');
+      if (incomeNum) updatedProfile.income = incomeNum;
+    }
+    updatedProfile.verifiedDoc = extractedData.docType || selectedDocType;
+    updatedProfile.verifiedAt = new Date().toISOString();
+
+    if (setProfile) {
+      setProfile(updatedProfile);
+    }
+    localStorage.setItem('sarthi_profile', JSON.stringify(updatedProfile));
+    setAppliedToProfileNotice(true);
+  };
+
   // Handle Consent Prompt selection
   const handleConsentChoice = (choiceKey) => {
     setConsentChoice(choiceKey);
 
-    // Text fields ONLY to be stored (NEVER store the image base64)
     const textDataToSave = {
       docType: extractedData?.docType || selectedDocType,
       fullName: extractedData?.fullName,
@@ -103,23 +128,55 @@ export default function DocumentUpload({ language }) {
       savedAt: new Date().toISOString()
     };
 
+    // Also sync to Memory Center cards
+    let status = 'until_delete';
+    let badgeText = '✓ Remembered until you delete it';
+    let badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-300';
+
     if (choiceKey === 'remember_verification') {
-      // Store ONLY text fields in localStorage
       const existing = JSON.parse(localStorage.getItem('sarthi_verified_docs') || '[]');
       existing.push({ ...textDataToSave, retention: 'Remember Until Verification' });
       localStorage.setItem('sarthi_verified_docs', JSON.stringify(existing));
       setSavedSuccessNotice("Extracted text attributes saved locally in storage until verification completes.");
     } else if (choiceKey === 'delete_session') {
-      // Store text fields ONLY in sessionStorage
+      status = 'session_only';
+      badgeText = '💬 Session only — deleted on tab close';
+      badgeStyle = 'bg-slate-100 text-slate-600 border-slate-300 opacity-80';
       const existing = JSON.parse(sessionStorage.getItem('sarthi_session_docs') || '[]');
       existing.push({ ...textDataToSave, retention: 'Delete After Session' });
       sessionStorage.setItem('sarthi_session_docs', JSON.stringify(existing));
       setSavedSuccessNotice("Extracted text attributes stored temporarily for this browser session only.");
     } else if (choiceKey === 'use_once') {
+      status = 'session_only';
+      badgeText = '⚡ Applied once';
+      badgeStyle = 'bg-amber-50 text-amber-900 border-amber-300';
       setSavedSuccessNotice("Verified fields applied once. No data saved to storage.");
     } else if (choiceKey === 'never_store') {
+      status = 'never_stored';
+      badgeText = '🔒 Never stored — discarded';
+      badgeStyle = 'bg-slate-100 text-slate-700 border-slate-300';
       setSavedSuccessNotice("Verification discarded. Zero data stored.");
     }
+
+    // Push new card into sarthi_memory_center_cards
+    try {
+      const existingCards = JSON.parse(localStorage.getItem('sarthi_memory_center_cards') || '[]');
+      const newCard = {
+        id: `doc_${Date.now()}`,
+        title: extractedData?.docType || selectedDocType,
+        iconName: 'fileText',
+        speechBubble: `Verified document for ${extractedData?.fullName || 'User'}. ID: ${extractedData?.identifierNumber || 'Verified'}`,
+        status,
+        expiryDate: null,
+        badgeText,
+        badgeStyle
+      };
+      const updatedCards = [newCard, ...existingCards.filter(c => c.title !== (extractedData?.docType || selectedDocType))];
+      localStorage.setItem('sarthi_memory_center_cards', JSON.stringify(updatedCards));
+    } catch (e) {}
+
+    // Automatically apply to profile when user confirms consent
+    handleApplyToProfile();
   };
 
   return (
