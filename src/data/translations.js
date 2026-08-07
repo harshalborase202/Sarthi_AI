@@ -67,7 +67,20 @@ export const translations = {
     alternativeSchemes: "Recommended Alternative Schemes",
     noSchemesTitle: "No Schemes Found Matching Exact Profile",
     noSchemesDesc: "Try adjusting your annual income or selecting broader category options to discover available central and state benefits.",
-    resetProfile: "Reset Profile Inputs"
+    resetProfile: "Reset Profile Inputs",
+    
+    // Memory & Privacy Control
+    memoryHeaderTitle: "What should BharatAI remember?",
+    memoryHeaderSubtitle: "You control what's saved, for how long, and can change this anytime.",
+    rememberEverything: "Remember Everything",
+    rememberEverythingSubtext: "Convenient default for faster future scheme searches",
+    rememberNothing: "Remember Nothing",
+    rememberNothingSubtext: "Zero data saved. Re-enter details every session",
+    orChooseIndividually: "Or choose individually:",
+    savePreferences: "Save My Preferences",
+    viewDeleteStoredData: "View & Delete Stored Data",
+    currentlyRemembering: "Currently remembering:",
+    selectDurationPrompt: "Select retention duration for this field:"
   },
   HI: {
     appTitle: "सारथी AI",
@@ -137,7 +150,20 @@ export const translations = {
     alternativeSchemes: "अनुशंसित वैकल्पिक योजनाएं",
     noSchemesTitle: "सटीक प्रोफ़ाइल से मेल खाती कोई योजना नहीं मिली",
     noSchemesDesc: "उपलब्ध केंद्रीय और राज्य लाभ खोजने के लिए अपनी वार्षिक आय या श्रेणी विकल्पों को समायोजित करने का प्रयास करें।",
-    resetProfile: "प्रोफ़ाइल रीसेट करें"
+    resetProfile: "प्रोफ़ाइल रीसेट करें",
+
+    // Memory & Privacy Control
+    memoryHeaderTitle: "भारत AI को क्या याद रखना चाहिए?",
+    memoryHeaderSubtitle: "आप नियंत्रित करते हैं कि क्या सहेजा जाए, कितने समय के लिए, और इसे कभी भी बदल सकते हैं।",
+    rememberEverything: "सब कुछ याद रखें",
+    rememberEverythingSubtext: "भविष्य की योजना खोजों के लिए सुविधाजनक",
+    rememberNothing: "कुछ भी याद न रखें",
+    rememberNothingSubtext: "कोई डेटा सहेजा नहीं जाएगा। हर सत्र में विवरण फिर से दर्ज करें",
+    orChooseIndividually: "या व्यक्तिगत रूप से चुनें:",
+    savePreferences: "मेरी प्राथमिकताएं सहेजें",
+    viewDeleteStoredData: "सहेजे गए डेटा को देखें और हटाएं",
+    currentlyRemembering: "वर्तमान में याद रखा जा रहा है:",
+    selectDurationPrompt: "इस फ़ील्ड की अवधि चुनें:"
   },
   MR: {
     appTitle: "सारथी AI",
@@ -207,6 +233,19 @@ export const translations = {
     alternativeSchemes: "पर्यायी योजना",
     noSchemesTitle: "माहितीशी जुळणारी कोणतीही योजना सापडली नाही",
     noSchemesDesc: "इतर केंद्रीय व राज्यस्तरीय योजना पाहण्यासाठी उत्पन्न किंवा प्रवर्ग बदला.",
-    resetProfile: "माहिती रीसेट करा"
+    resetProfile: "माहिती रीसेट करा",
+
+    // Memory & Privacy Control
+    memoryHeaderTitle: "भारत AI ने काय लक्षात ठेवावे?",
+    memoryHeaderSubtitle: "काय जतन करायचे, किती काळासाठी, हे तुम्ही नियंत्रित करता व कधीही बदलू शकता.",
+    rememberEverything: "सर्व काही लक्षात ठेवा",
+    rememberEverythingSubtext: "पुढील योजना शोधासाठी सोयीस्कर",
+    rememberNothing: "काहीही लक्षात ठेवू नका",
+    rememberNothingSubtext: "माहिती जतन केली जाणार नाही. प्रत्येक वेळी पुन्हा माहिती प्रविष्ट करा",
+    orChooseIndividually: "किंवा वैयक्तिकरित्या निवडा:",
+    savePreferences: "माझ्या पसंती जतन करा",
+    viewDeleteStoredData: "जतन केलेली माहिती पहा व हटवा",
+    currentlyRemembering: "सध्या लक्षात ठेवले आहे:",
+    selectDurationPrompt: "कालावधी निवडा:"
   }
 };
