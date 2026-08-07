@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Grid, ShieldCheck, User } from 'lucide-react';
+import { Home, Grid, ShieldCheck, Brain } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function BottomNavbar({ language }) {
@@ -23,9 +23,9 @@ export default function BottomNavbar({ language }) {
       icon: ShieldCheck
     },
     {
-      to: '/profile',
-      label: 'Profile',
-      icon: User
+      to: '/memory',
+      label: 'Memory',
+      icon: Brain
     }
   ];
 
