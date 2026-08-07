@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SarthiAI - Profile Input</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#8f4e00",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#72de5c",
+                        "on-surface-variant": "#43474e",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary": "#002045",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-container": "#fe9832",
+                        "on-tertiary-fixed": "#012200",
+                        "on-tertiary-container": "#49b538",
+                        "on-surface": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#035300",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#001b3c",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "tertiary-fixed": "#8dfc75",
+                        "outline": "#74777f",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-container": "#024000",
+                        "inverse-primary": "#adc7f7",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-fixed-dim": "#ffb77a",
+                        "primary-container": "#1a365d",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface-dim": "#d8dadc",
+                        "tertiary": "#012800",
+                        "on-secondary-container": "#683700",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#6d3a00",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "surface-tint": "#455f88",
+                        "on-primary-container": "#86a0cd",
+                        "secondary-fixed": "#ffdcc2",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c4c6cf",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#2e1500",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "stack-lg": "32px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for dropdowns */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-container-low border-b border-outline-variant dark:border-outline shadow-sm">
+<div class="flex items-center gap-4">
+<img alt="SarthiAI Logo" class="h-8 w-8 object-contain rounded-full" src="https://lh3.googleusercontent.com/aida/AP1WRLu_4-cdE4CU3UVTNxPqRg6rQem_KgfTaS25cKaJRNewZbUSF3EGBsdDfZuN8FWjAgCuWJMn9fPOOxXlpXddHE817m9ljXER_srL9wuh6Md8XXBJ1WycDPAjMcTm5-hqNUr4z1d3Zpljm1OB9viO1wrIsPGuhsKEq3_O7z31kSrdPHftNIA327ouibK5ofwSsvs6gOeBNXytm0UaP5JrQ-QYPlsFjsY6ySGztF3P-3-1uj62tYed4a8-mMQ"/>
+<span class="text-headline-md font-headline-md text-primary dark:text-primary-fixed">SarthiAI</span>
+</div>
+<div class="flex items-center">
+<span class="text-label-md font-label-md text-on-surface-variant cursor-pointer active:opacity-80 hover:bg-surface-container-high px-2 py-1 rounded">
+                EN | हिंदी | मराठी
+            </span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[64px] pb-[96px] md:pb-[32px] overflow-y-auto">
+<!-- Hero Image Section -->
+<div class="w-full h-48 md:h-64 lg:h-80 relative overflow-hidden">
+<img alt="Diverse group of Indian citizens looking hopeful" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuP3bv45vDbobX1waqP5v3CfnfzHis1eMApuozymKdUsnV7ZY9F2xF27elrDB2QXBVRqw9o8A_42iv2wA-J5b6WlS2RwAJhgMdM_FRUjEgFzb53w_Wxddhc6iC5uIkLSTq2ts21zuiCQ2uUw4ucpR6QEy0b3dWBiihpWJiO9S6ViYw2PO7MZD3by6rh-_3tGihdv0GE53_xow6VggLTjNFiFphvVYDEwtrv03bfqaFzDL2S1HkU8RLP8AU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end justify-center pb-4">
+</div>
+</div>
+<div class="px-margin-mobile md:px-margin-desktop flex justify-center items-start">
+<!-- Form Container -->
+<div class="w-full max-w-2xl bg-surface-container-lowest border border-outline-variant shadow-sm p-6 md:p-8 mt-4 md:mt-8 rounded-lg -mt-8 relative z-10">
+<div class="mb-stack-lg text-center">
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-surface mb-2">Tell us about yourself</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">We need a few details to find the best government schemes for you.</p>
+</div>
+<form class="space-y-stack-md">
+<!-- Age & Gender Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Age -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="age">Age<span class="material-symbols-outlined text-[16px] ml-1 cursor-pointer align-middle text-outline" title="Determines which age-based schemes apply to you.">info</span></label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="calendar_month">calendar_month</span>
+</span>
+<input class="w-full pl-11 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors" id="age" name="age" placeholder="e.g. 35" required="" type="number"/>
+</div>
+</div>
+<!-- Gender -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="gender">Gender</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="wc">wc</span>
+</span>
+<select class="w-full pl-11 pr-10 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors cursor-pointer" id="gender" name="gender" required="">
+<option disabled="" selected="" value="">Select Gender</option>
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+</select>
+<span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</span>
+</div>
+</div>
+</div>
+<!-- State -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="state">State</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="map">map</span>
+</span>
+<select class="w-full pl-11 pr-10 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors cursor-pointer" id="state" name="state" required="">
+<option disabled="" selected="" value="">Select your state</option>
+<option value="maharashtra">Maharashtra</option>
+<option value="delhi">Delhi</option>
+<option value="karnataka">Karnataka</option>
+<option value="gujarat">Gujarat</option>
+<!-- Add more states as needed -->
+</select>
+<span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</span>
+</div>
+</div>
+<!-- Education Level -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="education">Education Level</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="school">school</span>
+</span>
+<select class="w-full pl-11 pr-10 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors cursor-pointer" id="education" name="education" required="">
+<option disabled="" selected="" value="">Select highest education</option>
+<option value="none">No formal education</option>
+<option value="primary">Primary (up to 5th)</option>
+<option value="secondary">Secondary (up to 10th)</option>
+<option value="higher_secondary">Higher Secondary (12th)</option>
+<option value="graduate">Graduate</option>
+<option value="post_graduate">Post Graduate</option>
+</select>
+<span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</span>
+</div>
+</div>
+<!-- Income & Category Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Annual Family Income -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="income">Annual Family Income<span class="material-symbols-outlined text-[16px] ml-1 cursor-pointer align-middle text-outline" title="Used to check income-based eligibility limits.">info</span></label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="currency_rupee">currency_rupee</span>
+</span>
+<select class="w-full pl-11 pr-10 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors cursor-pointer" id="income" name="income" required="">
+<option disabled="" selected="" value="">Select range</option>
+<option value="0_1L">Up to ₹1 Lakh</option>
+<option value="1_2.5L">₹1 Lakh - ₹2.5 Lakhs</option>
+<option value="2.5_5L">₹2.5 Lakhs - ₹5 Lakhs</option>
+<option value="5_8L">₹5 Lakhs - ₹8 Lakhs</option>
+<option value="8L+">Above ₹8 Lakhs</option>
+</select>
+<span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</span>
+</div>
+</div>
+<!-- Category -->
+<div class="flex flex-col gap-2">
+<label class="text-label-md font-label-md text-on-surface" for="category">Category<span class="material-symbols-outlined text-[16px] ml-1 cursor-pointer align-middle text-outline" title="Some schemes reserve slots or have different income limits by category.">info</span></label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+</span>
+<select class="w-full pl-11 pr-10 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-secondary-container transition-colors cursor-pointer" id="category" name="category" required="">
+<option disabled="" selected="" value="">Select category</option>
+<option value="open">Open/General</option>
+<option value="obc">OBC</option>
+<option value="sc">SC</option>
+<option value="st">ST</option>
+<option value="ebc">EBC</option>
+</select>
+<span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Trust Microcopy -->
+<div class="flex items-start gap-3 p-4 bg-surface rounded-lg mt-stack-md border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" data-icon="shield_lock">shield_lock</span>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Your data is used only to match schemes and is never stored on our servers.</p>
+</div>
+<!-- Submit Button -->
+<div class="pt-stack-md">
+<button class="w-full flex items-center justify-center gap-2 text-on-primary min-h-[48px] px-6 py-3 rounded-lg text-label-md font-label-md hover:opacity-90 transition-opacity active:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container shadow-sm" style="background-color: #1A365D; font-weight: 700;" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+                        Find My Schemes
+                    </button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 bg-surface dark:bg-surface-container-low border-t border-outline-variant dark:border-outline shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">apps</span>
+<span class="font-label-md text-label-md">Services</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-md text-label-md">Verify</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav></body></html>

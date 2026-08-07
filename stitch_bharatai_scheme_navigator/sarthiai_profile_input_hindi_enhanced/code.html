@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html class="light" lang="hi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SarthiAI - कोई परिणाम नहीं</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#8f4e00",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#72de5c",
+                        "on-surface-variant": "#43474e",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary": "#002045",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "secondary-container": "#fe9832",
+                        "on-tertiary-fixed": "#012200",
+                        "on-tertiary-container": "#49b538",
+                        "on-surface": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#035300",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#001b3c",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "tertiary-fixed": "#8dfc75",
+                        "outline": "#74777f",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-container": "#024000",
+                        "inverse-primary": "#adc7f7",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-fixed-dim": "#ffb77a",
+                        "primary-container": "#1a365d",
+                        "primary-fixed-dim": "#adc7f7",
+                        "surface-dim": "#d8dadc",
+                        "tertiary": "#012800",
+                        "on-secondary-container": "#683700",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#6d3a00",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "surface-tint": "#455f88",
+                        "on-primary-container": "#86a0cd",
+                        "secondary-fixed": "#ffdcc2",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c4c6cf",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#2e1500",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "stack-lg": "32px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for dropdowns */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-container-low border-b border-outline-variant dark:border-outline shadow-sm">
+<div class="flex items-center gap-4">
+<img alt="SarthiAI Logo" class="h-8 w-8 object-contain rounded-md" src="https://lh3.googleusercontent.com/aida/AP1WRLu_4-cdE4CU3UVTNxPqRg6rQem_KgfTaS25cKaJRNewZbUSF3EGBsdDfZuN8FWjAgCuWJMn9fPOOxXlpXddHE817m9ljXER_srL9wuh6Md8XXBJ1WycDPAjMcTm5-hqNUr4z1d3Zpljm1OB9viO1wrIsPGuhsKEq3_O7z31kSrdPHftNIA327ouibK5ofwSsvs6gOeBNXytm0UaP5JrQ-QYPlsFjsY6ySGztF3P-3-1uj62tYed4a8-mMQ"/>
+<span class="text-headline-md font-headline-md text-primary dark:text-primary-fixed">SarthiAI</span>
+</div>
+<div class="flex items-center">
+<span class="text-label-md font-label-md text-on-surface-variant cursor-pointer">
+                EN | <span class="text-primary font-bold">हिंदी</span> | मराठी
+            </span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[80px] pb-[96px] md:pb-[32px] px-margin-mobile md:px-margin-desktop flex justify-center items-center overflow-y-auto">
+<div class="flex flex-col items-center justify-center text-center max-w-md w-full">
+<img alt="कोई परिणाम नहीं" class="w-64 h-64 object-contain mb-8" src="https://lh3.googleusercontent.com/aida/AP1WRLtj5ucr1rH6rKfByeFi8qFPvssAmBuAm98h8KqAIyp6V5kliI1nt9JLydCFHBT6uEUAJd_ybzQfJRzoEJSSb4hf0H9kqp86tfv0yWioYfPwbBA1qEaE4A4cWr1bfDokH1cnMng_hszQtgWTtUXahSJZEAiwUBnqCot-tgtLVaYLr-MDW9r1eMu9NZYl4DPey_aShYCHbv6mnMyFYrwfXuGrewMaytxSWnYzyDOjrBiRXGcqGcR7ctniB7Q"/>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-2">कोई परिणाम नहीं मिला</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">कृपया अपनी खोज शर्तों या फ़िल्टर को बदलने का प्रयास करें।</p>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant flex justify-around items-center h-16 md:hidden z-50"><button class="flex flex-col items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined">home</span><span class="text-label-sm">होम</span></button><button class="flex flex-col items-center gap-1 text-primary"><span class="material-symbols-outlined">search</span><span class="text-label-sm">खोजें</span></button><button class="flex flex-col items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined">person</span><span class="text-label-sm">प्रोफ़ाइल</span></button></nav></body></html>

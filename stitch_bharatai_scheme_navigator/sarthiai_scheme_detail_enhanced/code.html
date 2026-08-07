@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SarthiAI - Scheme Detail</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Style Guidance -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#2e1500",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#8f4e00",
+                    "tertiary-fixed": "#8dfc75",
+                    "on-secondary-fixed-variant": "#6d3a00",
+                    "on-primary-container": "#86a0cd",
+                    "on-background": "#191c1e",
+                    "primary-container": "#1a365d",
+                    "outline": "#74777f",
+                    "tertiary-container": "#024000",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "primary": "#002045",
+                    "primary-fixed": "#d6e3ff",
+                    "on-surface-variant": "#43474e",
+                    "on-surface": "#191c1e",
+                    "inverse-surface": "#2d3133",
+                    "primary-fixed-dim": "#adc7f7",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#012800",
+                    "background": "#f7f9fb",
+                    "surface-container": "#eceef0",
+                    "on-primary-fixed": "#001b3c",
+                    "secondary-fixed-dim": "#ffb77a",
+                    "on-tertiary-fixed": "#012200",
+                    "tertiary-fixed-dim": "#72de5c",
+                    "inverse-primary": "#adc7f7",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#683700",
+                    "surface-bright": "#f7f9fb",
+                    "secondary-container": "#fe9832",
+                    "on-tertiary-container": "#49b538",
+                    "on-tertiary-fixed-variant": "#035300",
+                    "outline-variant": "#c4c6cf",
+                    "surface-tint": "#455f88",
+                    "inverse-on-surface": "#eff1f3",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#ffdcc2",
+                    "on-primary-fixed-variant": "#2d476f",
+                    "surface": "#f7f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "32px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-mobile": "16px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .fill-icon {
+        font-variation-settings: 'FILL' 1;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pt-16 pb-20 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-container-low shadow-sm border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-2 text-primary dark:text-primary-fixed cursor-pointer active:opacity-80">
+<img alt="SarthiAI Logo" class="h-8 w-8 object-contain rounded-md" src="https://lh3.googleusercontent.com/aida/AP1WRLu_4-cdE4CU3UVTNxPqRg6rQem_KgfTaS25cKaJRNewZbUSF3EGBsdDfZuN8FWjAgCuWJMn9fPOOxXlpXddHE817m9ljXER_srL9wuh6Md8XXBJ1WycDPAjMcTm5-hqNUr4z1d3Zpljm1OB9viO1wrIsPGuhsKEq3_O7z31kSrdPHftNIA327ouibK5ofwSsvs6gOeBNXytm0UaP5JrQ-QYPlsFjsY6ySGztF3P-3-1uj62tYed4a8-mMQ"/>
+<span class="font-headline-md text-headline-md font-bold tracking-tight">SarthiAI</span>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant flex gap-2">
+<span class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-2 py-1 rounded text-primary dark:text-primary-fixed font-bold border-b-2 border-secondary">EN</span>
+<span class="">|</span>
+<span class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-2 py-1 rounded">हिंदी</span>
+<span class="">|</span>
+<span class="cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors px-2 py-1 rounded">मराठी</span>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop pt-stack-lg pb-stack-lg flex flex-col gap-stack-lg">
+<!-- Header Section -->
+<div class="flex items-start justify-between flex-wrap gap-4">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background mb-2">PM Kisan Samman Nidhi</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Financial assistance scheme for landholding farmer families across India.</p>
+</div>
+<!-- Confidence Meter -->
+<div class="flex flex-col gap-4 w-full md:w-auto">
+<div class="bg-surface-container-lowest p-4 shadow-sm border border-outline-variant flex items-center gap-4 w-full rounded-lg">
+<div class="relative w-20 h-20 flex-shrink-0">
+<img alt="93% Confidence Gauge" class="w-full h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida/AP1WRLuI8arJyISBeiPzulU5-AST2UUYTdfMcnDjwbVfwRIdtL5yeP7uqfspFNsC7cEjomsKiviD9Zym-cCFkIC92b4kbD-zrZrMTHlBnWYpvFf9uzDoGwI3u0c-r9SZKgJiSL0rM3hDvyHCcrgC-pwJdFebNa12safzGOR9426xcVN_5zfXOvExb2jZWUXXBIv6g9dUOa2S2WFRuIAsZssIj6igeoFmwErLW0tuDwBVjLTgr9311zAtuI6soUo"/>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-background font-semibold">Confidence Score</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Matched against official rules</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Match Breakdown Bar Chart -->
+<div class="w-full">
+<img alt="Match Breakdown Bar Chart" class="w-full max-w-3xl rounded-lg border border-outline-variant shadow-sm mix-blend-multiply" src="https://lh3.googleusercontent.com/aida/AP1WRLtHnYCTC16rwPfs7oUK6eP2Cp-4gAyFSQkQiXMDqwMvTxBUIzdqKG7Ta7vYYbzGg5e9WjFwsdLqrcUUqQF9oY1L_z7-Pg_foXHrWzWeMCIiSMw-b1-7LkDFW0eceOxRM4PlsCJ2ipjc9ZUUcMhil3Hs9bafP6dnN93OjxlYRqPh6h7HjVP05FViGrVuYq1HHA6g2WgRT9Qj6-uNWhDZ0YJshrL5qLfNZ3i8hB3xcSC1B0JpoJzZJT0Igew"/>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Eligibility Checklist -->
+<section class="bg-surface-container-lowest p-6 shadow-sm border border-outline-variant flex flex-col gap-4 rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" data-icon="fact_check">fact_check</span>
+<h2 class="font-headline-md text-headline-md text-on-background">Eligibility Match</h2>
+</div>
+<ul class="flex flex-col gap-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container fill-icon mt-0.5" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-background">Landholding farmer family</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container fill-icon mt-0.5" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-background">Resident of India</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container fill-icon mt-0.5" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="font-body-md text-body-md text-on-background">Valid Aadhaar card</span>
+</li>
+</ul>
+</section>
+<!-- Documents Checklist -->
+<section class="bg-surface-container-lowest p-6 shadow-sm border border-outline-variant flex flex-col gap-4 rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+<h2 class="font-headline-md text-headline-md text-on-background">Required Documents</h2>
+</div>
+<ul class="flex flex-col gap-3">
+<li class="flex items-start gap-3 bg-surface-container-low p-3 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-tertiary-container fill-icon mt-0.5" data-icon="check_circle" data-weight="fill">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-background font-medium">Aadhaar Card</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Found in digital locker</span>
+</div>
+</li>
+<li class="flex items-start gap-3 bg-surface-container-low p-3 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-tertiary-container fill-icon mt-0.5" data-icon="check_circle" data-weight="fill">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-background font-medium">Land Ownership Docs</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Verified</span>
+</div>
+</li>
+<li class="flex items-start gap-3 bg-error-container p-3 rounded-lg border border-error/20">
+<span class="material-symbols-outlined text-error fill-icon mt-0.5" data-icon="cancel" data-weight="fill">cancel</span>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-error-container font-medium">Bank Account Passbook</span>
+<span class="font-label-sm text-label-sm text-error">Missing - Upload required</span>
+</div>
+</li>
+</ul>
+</section>
+</div>
+<!-- Action Area -->
+<div class="mt-stack-md flex flex-col items-center gap-stack-md">
+<button class="bg-primary-container text-on-primary min-h-[48px] w-full md:w-auto px-8 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-sm" style="background-color: rgb(26, 77, 143); font-weight: 700;">
+<span class="material-symbols-outlined" data-icon="open_in_new">open_in_new</span>
+                 Apply on Official Portal
+             </button>
+<!-- Disclaimer -->
+<div class="bg-surface-container-low rounded-lg p-4 flex gap-3 items-start border border-outline-variant w-full max-w-3xl mx-auto mt-4">
+<span class="material-symbols-outlined text-secondary-container mt-0.5" data-icon="info">info</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                     This is guidance based on public scheme data — always confirm final eligibility on the official government portal.
+                 </p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 bg-surface dark:bg-surface-container-low border-t border-outline-variant flex justify-around items-center px-4 z-50 md:hidden">
+<a class="flex flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="home">home</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-sm text-[10px]">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-label-sm text-[10px]">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>
