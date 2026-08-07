@@ -11,6 +11,7 @@ import BottomNavbar from './components/BottomNavbar';
 import DocumentUpload from './components/DocumentUpload';
 import ProfileSettings from './components/ProfileSettings';
 import MemoryCenter from './components/MemoryCenter';
+import UserProfile from './components/UserProfile';
 import { evaluateProfile } from './data/schemes';
 
 function AppContent() {
@@ -158,8 +159,10 @@ function AppContent() {
           <Route
             path="/profile"
             element={
-              <MemoryCenter
+              <UserProfile
+                profile={profile}
                 language={language}
+                setLanguage={setLanguage}
               />
             }
           />
