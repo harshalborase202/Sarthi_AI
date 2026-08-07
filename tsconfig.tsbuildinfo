@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/header.tsx","./src/components/memoryconsenttoast.tsx","./src/components/memorydashboard.tsx","./src/components/multistepform.tsx","./src/components/onboardingmodal.tsx","./src/components/resultsdashboard.tsx","./src/context/languagecontext.tsx","./src/context/memorycontext.tsx"],"version":"5.9.3"}
