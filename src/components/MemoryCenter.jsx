@@ -74,6 +74,29 @@ export default function MemoryCenter({ language }) {
   const [showConfirmForgetModal, setShowConfirmForgetModal] = useState(false);
   const [successToast, setSuccessToast] = useState(null);
 
+  // Fetch memory items from backend API on mount
+  useEffect(() => {
+    const loadBackendMemories = async () => {
+      try {
+        const res = await fetch('/api/memory');
+        const data = await res.json();
+        if (data && Array.isArray(data.memories) && data.memories.length > 0) {
+          setCards(prev => {
+            const map = new Map();
+            data.memories.forEach(m => map.set(m.id, m));
+            prev.forEach(p => {
+              if (!map.has(p.id)) map.set(p.id, p);
+            });
+            return Array.from(map.values());
+          });
+        }
+      } catch (err) {
+        console.warn("Backend memory load notice:", err);
+      }
+    };
+    loadBackendMemories();
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('sarthi_memory_center_cards', JSON.stringify(cards));
   }, [cards]);
@@ -84,7 +107,7 @@ export default function MemoryCenter({ language }) {
   const countNeverStored = cards.filter(c => c.status === 'never_stored' || c.status === 'session_only').length;
 
   // Handle status renegotiation inline
-  const handleUpdateCardStatus = (cardId, newStatus) => {
+  const handleUpdateCardStatus = async (cardId, newStatus) => {
     setCards(prev => prev.map(card => {
       if (card.id !== cardId) return card;
 
@@ -114,10 +137,21 @@ export default function MemoryCenter({ language }) {
     }));
 
     setEditingCardId(null);
+
+    // Call backend PUT endpoint if ID is UUID / server memory
+    try {
+      await fetch(`/api/memory/${cardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+    } catch (err) {
+      console.warn("Backend status update notice:", err);
+    }
   };
 
   // Handle Forget Everything action
-  const handleForgetEverything = () => {
+  const handleForgetEverything = async () => {
     setCards(prev => prev.map(card => ({
       ...card,
       status: 'never_stored',
@@ -129,6 +163,12 @@ export default function MemoryCenter({ language }) {
     sessionStorage.removeItem('sarthi_session_docs');
     localStorage.removeItem('sarthi_memory_center_cards');
     setShowConfirmForgetModal(false);
+
+    try {
+      await fetch('/api/memory/forget-all', { method: 'DELETE' });
+    } catch (err) {
+      console.warn("Backend forget-all notice:", err);
+    }
 
     setSuccessToast("Everything has been forgotten. Zero personal data remains stored.");
     setTimeout(() => setSuccessToast(null), 4000);

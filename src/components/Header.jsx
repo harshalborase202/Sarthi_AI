@@ -34,6 +34,15 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Ask AI Chatbot Button */}
+        <button
+          onClick={() => navigate('/chatbot')}
+          className="hidden sm:flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-fixed border border-primary/20 font-bold text-xs px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-saffron animate-pulse" />
+          <span>Ask AI Chatbot</span>
+        </button>
+
         {/* Language Selector Toggle */}
         <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant text-xs font-semibold">
           <Globe className="w-4 h-4 text-on-surface-variant ml-1 mr-1.5" />

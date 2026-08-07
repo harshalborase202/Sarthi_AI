@@ -9,14 +9,22 @@ from peewee import (
     CharField,
     TextField,
     DateTimeField,
-    BooleanField,
 )
 from dotenv import load_dotenv
 
 load_dotenv()
 
 DB_PATH = os.getenv("DATABASE_PATH", "./sarthi_ai.db")
-db = SqliteDatabase(DB_PATH)
+db = SqliteDatabase(
+    DB_PATH,
+    pragmas={
+        "journal_mode": "wal",
+        "foreign_keys": 1,
+        "cache_size": -64000,
+        "synchronous": 1,
+    },
+    timeout=20.0,
+)
 
 
 class BaseModel(Model):

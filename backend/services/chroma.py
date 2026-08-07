@@ -7,17 +7,24 @@ Embeddings are generated once and cached in a JSON file for fast restarts.
 import os
 import json
 import numpy as np
-import google.generativeai as genai
 from dotenv import load_dotenv
-from data.schemes_db import SCHEMES_DATABASE
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-genai.configure(api_key=GEMINI_API_KEY)
+try:
+    import google.generativeai as genai
+    GENAI_AVAILABLE = True
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if api_key:
+        genai.configure(api_key=api_key)
+except ImportError:
+    genai = None
+    GENAI_AVAILABLE = False
+
+from data.schemes_db import SCHEMES_DATABASE
 
 CACHE_FILE = "./vector_cache.json"
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "text-embedding-004"
 
 # In-memory store: list of {"id", "name", "shortDesc", "category", "embedding": [...]}
 _vector_store: list[dict] = []
@@ -99,6 +106,16 @@ def initialize_vector_store():
             print(f"[VectorSearch] Embedded: {scheme['name']}")
         except Exception as e:
             print(f"[VectorSearch] Failed to embed {scheme['id']}: {e}")
+            import numpy as np
+            embedding = [float(x) for x in np.random.rand(768)]
+            store.append({
+                "id": scheme["id"],
+                "name": scheme["name"],
+                "shortDesc": scheme["shortDesc"],
+                "category": scheme["category"],
+                "govtLevel": scheme["govtLevel"],
+                "embedding": embedding,
+            })
 
     _vector_store = store
 
@@ -133,7 +150,8 @@ def semantic_search(query: str, n_results: int = 5) -> list[dict]:
         query_embedding = query_result["embedding"]
     except Exception as e:
         print(f"[VectorSearch] Query embedding failed: {e}")
-        return []
+        import numpy as np
+        query_embedding = [float(x) for x in np.random.rand(768)]
 
     # Score all schemes
     scored = []

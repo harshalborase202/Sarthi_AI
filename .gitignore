@@ -25,6 +25,8 @@ logs
 
 # Temp files
 m.supportedGenerationMethods
+*.zip
+test_imports.py
 
 # Editor files
 .vscode/*

@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 from models.db import init_db
 from services.chroma import initialize_vector_store
 
-from routers import evaluate, schemes, memory, reasoning, chat, search, documents
+from routers import evaluate, schemes, memory, reasoning, chat, search, documents, ocr
 
 load_dotenv()
 
@@ -77,6 +77,7 @@ app.include_router(reasoning.router)
 app.include_router(chat.router)
 app.include_router(search.router)
 app.include_router(documents.router)
+app.include_router(ocr.router)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

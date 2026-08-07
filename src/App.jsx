@@ -14,6 +14,7 @@ import ProfileSettings from './components/ProfileSettings';
 import MemoryCenter from './components/MemoryCenter';
 import UserProfile from './components/UserProfile';
 import LandingPage from './components/LandingPage';
+import SchemeChatbot from './components/SchemeChatbot';
 import { evaluateProfile } from './data/schemes';
 
 function AppContent() {
@@ -21,8 +22,8 @@ function AppContent() {
   const location = useLocation();
   const [language, setLanguage] = useState('EN');
 
-  // Pre-filled defaults matching demo script in README
-  const [profile, setProfile] = useState({
+  // Load profile from localStorage if saved, else default
+  const DEFAULT_PROFILE = {
     age: '22',
     gender: 'female',
     state: 'Maharashtra',
@@ -31,22 +32,23 @@ function AppContent() {
     category: 'sc',
     education: 'graduate',
     disability: 'no'
+  };
+
+  const [profile, setProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sarthi_user_profile');
+      return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
+    } catch (e) {
+      return DEFAULT_PROFILE;
+    }
   });
 
-  const [evaluationResult, setEvaluationResult] = useState(() => evaluateProfile({
-    age: '22',
-    gender: 'female',
-    state: 'Maharashtra',
-    occupation: 'student',
-    income: '250000',
-    category: 'sc',
-    education: 'graduate',
-    disability: 'no'
-  }));
+  const [evaluationResult, setEvaluationResult] = useState(() => evaluateProfile(profile));
 
   const [selectedScheme, setSelectedScheme] = useState(null);
 
   const handleProfileSubmit = () => {
+    localStorage.setItem('sarthi_user_profile', JSON.stringify(profile));
     const result = evaluateProfile(profile);
     setEvaluationResult(result);
     navigate('/reasoning');
@@ -139,6 +141,14 @@ function AppContent() {
           <Route 
             path="/scan-ad" 
             element={<AdPamphletScanner language={language} />} 
+          />
+          <Route 
+            path="/chatbot" 
+            element={<SchemeChatbot profile={profile} language={language} />} 
+          />
+          <Route 
+            path="/ask-ai" 
+            element={<SchemeChatbot profile={profile} language={language} />} 
           />
           <Route 
             path="/documents" 

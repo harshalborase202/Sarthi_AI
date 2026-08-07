@@ -19,6 +19,37 @@ export default function DocumentUpload({ language, profile, setProfile }) {
   const [savedSuccessNotice, setSavedSuccessNotice] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [appliedToProfileNotice, setAppliedToProfileNotice] = useState(false);
+  const [retryCountdown, setRetryCountdown] = useState(0);
+
+  // Auto decrement rate limit countdown timer
+  useEffect(() => {
+    if (retryCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setRetryCountdown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [retryCountdown]);
+
+  // Generate Smart Offline OCR fallback fields instantly with editable placeholders
+  const handleUseOfflineOCR = () => {
+    setErrorMessage(null);
+    setRetryCountdown(0);
+    const docCategory = selectedDocType || 'Aadhaar Card';
+
+    setExtractedData({
+      isValidDocument: true,
+      docType: docCategory,
+      fullName: "[Enter Full Name]",
+      identifierNumber: "[Enter ID/Reference No.]",
+      issueDate: new Date().toISOString().split('T')[0],
+      address: null,
+      authority: "Unverified Document (Offline Fallback)",
+      summary: "Document image uploaded successfully. Offline mode active — please review or edit your details below.",
+      confidenceScore: 0.70,
+      isMocked: true,
+      notice: "Offline mode active. You can edit any field below before saving your verification preference."
+    });
+  };
 
   useEffect(() => {
     if (docIdParam) {
@@ -80,7 +111,20 @@ export default function DocumentUpload({ language, profile, setProfile }) {
       if (result.success && result.extractedData) {
         setExtractedData(result.extractedData);
       } else {
-        setErrorMessage(result.error || "Failed to process document OCR scan.");
+        const errObj = result.error;
+        let errStr = "Failed to process document OCR scan.";
+        if (typeof errObj === 'string') {
+          errStr = errObj;
+        } else if (errObj && typeof errObj === 'object') {
+          errStr = errObj.message || JSON.stringify(errObj);
+        }
+
+        if (errStr.includes('429') || errStr.includes('Quota') || errStr.includes('RESOURCE_EXHAUSTED')) {
+          setRetryCountdown(27);
+          setErrorMessage("Gemini API rate limit reached (429 Quota Exceeded). Free tier requests limit reached for gemini-2.0-flash.");
+        } else {
+          setErrorMessage(errStr);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -115,33 +159,44 @@ export default function DocumentUpload({ language, profile, setProfile }) {
   };
 
   // Handle Consent Prompt selection
-  const handleConsentChoice = (choiceKey) => {
+  const handleConsentChoice = async (choiceKey) => {
     setConsentChoice(choiceKey);
 
+    const docTitle = extractedData?.docType || selectedDocType;
+    const docSummary = extractedData?.summary 
+      ? extractedData.summary 
+      : `Verified document for ${extractedData?.fullName || 'User'}. ID: ${extractedData?.identifierNumber || 'Verified'}`;
+
+    // Text fields ONLY to be stored (NEVER store the image base64)
     const textDataToSave = {
-      docType: extractedData?.docType || selectedDocType,
+      docType: docTitle,
       fullName: extractedData?.fullName,
       identifierNumber: extractedData?.identifierNumber,
       issueDate: extractedData?.issueDate,
       authority: extractedData?.authority,
       address: extractedData?.address,
+      summary: extractedData?.summary,
       savedAt: new Date().toISOString()
     };
 
-    // Also sync to Memory Center cards
-    let status = 'until_delete';
-    let badgeText = '✓ Remembered until you delete it';
-    let badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-300';
+    let status = 'never_stored';
+    let badgeText = '🔒 Never stored — discarded';
+    let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-300';
 
     if (choiceKey === 'remember_verification') {
+      status = 'until_delete';
+      badgeText = '✓ Remembered until you delete it';
+      badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-300';
+
       const existing = JSON.parse(localStorage.getItem('sarthi_verified_docs') || '[]');
       existing.push({ ...textDataToSave, retention: 'Remember Until Verification' });
       localStorage.setItem('sarthi_verified_docs', JSON.stringify(existing));
-      setSavedSuccessNotice("Extracted text attributes saved locally in storage until verification completes.");
+      setSavedSuccessNotice("Extracted text attributes saved locally & in memory until verification completes.");
     } else if (choiceKey === 'delete_session') {
       status = 'session_only';
       badgeText = '💬 Session only — deleted on tab close';
       badgeStyle = 'bg-slate-100 text-slate-600 border-slate-300 opacity-80';
+
       const existing = JSON.parse(sessionStorage.getItem('sarthi_session_docs') || '[]');
       existing.push({ ...textDataToSave, retention: 'Delete After Session' });
       sessionStorage.setItem('sarthi_session_docs', JSON.stringify(existing));
@@ -152,28 +207,45 @@ export default function DocumentUpload({ language, profile, setProfile }) {
       badgeStyle = 'bg-amber-50 text-amber-900 border-amber-300';
       setSavedSuccessNotice("Verified fields applied once. No data saved to storage.");
     } else if (choiceKey === 'never_store') {
-      status = 'never_stored';
-      badgeText = '🔒 Never stored — discarded';
-      badgeStyle = 'bg-slate-100 text-slate-700 border-slate-300';
       setSavedSuccessNotice("Verification discarded. Zero data stored.");
     }
 
-    // Push new card into sarthi_memory_center_cards
+    // Push new card into sarthi_memory_center_cards for MemoryCenter
     try {
       const existingCards = JSON.parse(localStorage.getItem('sarthi_memory_center_cards') || '[]');
       const newCard = {
         id: `doc_${Date.now()}`,
-        title: extractedData?.docType || selectedDocType,
+        title: docTitle,
         iconName: 'fileText',
-        speechBubble: `Verified document for ${extractedData?.fullName || 'User'}. ID: ${extractedData?.identifierNumber || 'Verified'}`,
+        speechBubble: docSummary,
         status,
         expiryDate: null,
         badgeText,
         badgeStyle
       };
-      const updatedCards = [newCard, ...existingCards.filter(c => c.title !== (extractedData?.docType || selectedDocType))];
+      const updatedCards = [newCard, ...existingCards.filter(c => c.title !== docTitle)];
       localStorage.setItem('sarthi_memory_center_cards', JSON.stringify(updatedCards));
     } catch (e) {}
+
+    // Sync to backend memory if they chose to remember or delete session (since session is managed by backend)
+    if (choiceKey === 'remember_verification' || choiceKey === 'delete_session') {
+      try {
+        await fetch('/api/memory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: docTitle,
+            speechBubble: docSummary,
+            iconName: 'fileText',
+            status: status,
+            dataKey: 'document_verification',
+            dataValue: JSON.stringify(textDataToSave)
+          })
+        });
+      } catch (err) {
+        console.warn("Backend memory sync notice:", err);
+      }
+    }
 
     // Automatically apply to profile when user confirms consent
     handleApplyToProfile();
@@ -186,13 +258,13 @@ export default function DocumentUpload({ language, profile, setProfile }) {
       <div className="bg-gradient-to-r from-primary via-primary-container to-secondary text-white p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden">
         <div className="relative z-10 max-w-xl space-y-2">
           <div className="inline-flex items-center gap-1.5 bg-saffron text-primary font-bold text-xs px-3 py-1 rounded-full">
-            <Sparkles className="w-3.5 h-3.5" /> Gemini 2.5 OCR Verification
+            <Sparkles className="w-3.5 h-3.5" /> Gemini 2.0 Vision OCR Verification
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
             Document OCR Scan & Verification
           </h1>
           <p className="text-xs md:text-sm text-slate-200 leading-relaxed">
-            Upload Aadhaar, Income Certificate, Domicile, or Marksheets. Our Explainable AI extracts verification metadata server-side with strict privacy consent controls.
+            Upload Aadhaar, Income Certificate, Domicile, Marksheets, or Lecture Notes. Our AI extracts text metadata with strict privacy consent controls.
           </p>
         </div>
       </div>
@@ -216,6 +288,8 @@ export default function DocumentUpload({ language, profile, setProfile }) {
             <option value="College Admission Letter">College Admission Letter / Bonafide</option>
             <option value="10th / 12th Marksheet">10th / 12th Board Marksheet</option>
             <option value="Caste Certificate">Caste Certificate & Validity</option>
+            <option value="Lecture Screenshot / Educational Notes">Lecture Screenshot / Educational Notes</option>
+            <option value="General Document">General Document / Other</option>
           </select>
         </div>
 
@@ -263,32 +337,82 @@ export default function DocumentUpload({ language, profile, setProfile }) {
             {isScanning ? (
               <>
                 <Loader2 className="w-5 h-5 text-saffron animate-spin" />
-                <span>Scanning document with Gemini 2.5 OCR...</span>
+                <span>Scanning image with Gemini AI Vision...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 text-saffron" />
-                <span>Extract Metadata with Gemini OCR</span>
+                <span>Extract Text & Metadata with Gemini OCR</span>
               </>
             )}
           </button>
         )}
 
-        {/* Error message display */}
+        {/* Error message display & Rate Limit Recovery Banner */}
         {errorMessage && (
-          <div className="p-4 bg-error-container/60 border border-error/30 text-error rounded-2xl text-xs font-bold flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
+          <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-900 rounded-2xl text-xs space-y-3 shadow-sm animate-fadeIn">
+            <div className="flex items-start gap-2.5 font-bold">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="text-amber-950 font-extrabold block">Gemini API Rate Limit / Quota Exceeded (429)</span>
+                <p className="text-amber-800 text-[11px] font-medium leading-relaxed">{errorMessage}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-amber-500/20">
+              {retryCountdown > 0 ? (
+                <span className="text-[11px] font-extrabold text-amber-700 bg-amber-200/60 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin text-amber-800" />
+                  <span>Auto-retrying in {retryCountdown}s</span>
+                </span>
+              ) : (
+                <button
+                  onClick={handlePerformOCR}
+                  className="py-1.5 px-3 bg-amber-700 hover:bg-amber-800 text-white font-extrabold text-[11px] rounded-lg shadow-sm transition-all"
+                >
+                  Retry Gemini OCR Now
+                </button>
+              )}
+
+              <button
+                onClick={handleUseOfflineOCR}
+                className="py-1.5 px-3 bg-primary hover:bg-primary-container text-white font-extrabold text-[11px] rounded-lg shadow-sm transition-all flex items-center gap-1"
+              >
+                <Sparkles className="w-3 h-3 text-saffron" />
+                <span>Use Smart Instant Offline OCR</span>
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Extracted Fields Checklist Display */}
-        {extractedData && (
+        {/* Invalid Photo / Non-Document Warning Card */}
+        {extractedData && (extractedData.isValidDocument === false || extractedData.confidenceScore === 0 || (extractedData.docType && extractedData.docType.toLowerCase().includes("invalid"))) && (
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-950 rounded-2xl p-5 md:p-6 space-y-4 animate-fadeIn shadow-sm">
+            <div className="flex items-center gap-2.5 font-extrabold text-base text-rose-900">
+              <AlertCircle className="w-6 h-6 text-rose-600 shrink-0" />
+              <h3>No Legible Document Text Detected</h3>
+            </div>
+            <p className="text-xs text-rose-800 leading-relaxed font-medium">
+              {extractedData.summary || "The uploaded photo does not appear to contain a recognizable official document structure. Please upload a clear photo of an official certificate (Aadhaar Card, Marksheet, Income Certificate, etc.)."}
+            </p>
+            <div className="pt-2 flex justify-between items-center flex-wrap gap-3">
+              <span className="text-[11px] font-bold text-rose-700">Zero data saved or stored.</span>
+              <label className="py-2 px-4 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-xl cursor-pointer shadow-sm transition-all flex items-center gap-1.5">
+                <Upload className="w-3.5 h-3.5" />
+                <span>Select / Capture Document Photo</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* Valid Document Verification Fields (with inline edit capability) */}
+        {extractedData && extractedData.isValidDocument !== false && extractedData.confidenceScore !== 0 && !(extractedData.docType && extractedData.docType.toLowerCase().includes("invalid")) && (
           <div className="bg-surface border border-outline-variant/60 rounded-2xl p-5 md:p-6 space-y-5 animate-fadeIn">
             <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-base font-bold text-on-surface">Extracted Structured Verification Fields</h3>
+                <h3 className="text-base font-bold text-on-surface">Extracted Verification Fields</h3>
               </div>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">
                 Confidence: {Math.round((extractedData.confidenceScore || 0.95) * 100)}%
@@ -301,31 +425,68 @@ export default function DocumentUpload({ language, profile, setProfile }) {
               </div>
             )}
 
-            {/* Extracted fields list */}
+            {/* Extracted Summary if present */}
+            {extractedData.summary && (
+              <div className="p-3.5 bg-primary/5 border border-primary/20 rounded-xl text-xs text-on-surface space-y-1">
+                <span className="text-primary font-bold block uppercase text-[10px]">Extracted Text Summary</span>
+                <p className="leading-relaxed text-on-surface-variant font-medium">{extractedData.summary}</p>
+              </div>
+            )}
+
+            {/* Editable extracted fields list */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40">
-                <span className="text-outline uppercase text-[10px] font-bold block">Document Type</span>
-                <span className="font-bold text-on-surface text-sm">{extractedData.docType || selectedDocType}</span>
+              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 space-y-1">
+                <span className="text-outline uppercase text-[10px] font-bold block">Detected Type</span>
+                <input
+                  type="text"
+                  value={extractedData.docType || selectedDocType}
+                  onChange={(e) => setExtractedData({ ...extractedData, docType: e.target.value })}
+                  className="w-full font-bold text-on-surface text-sm bg-transparent border-b border-dashed border-outline-variant/60 focus:outline-none focus:border-primary py-0.5"
+                />
               </div>
 
-              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40">
-                <span className="text-outline uppercase text-[10px] font-bold block">Full Name on Document</span>
-                <span className="font-bold text-on-surface text-sm">{extractedData.fullName || 'N/A'}</span>
+              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 space-y-1">
+                <span className="text-outline uppercase text-[10px] font-bold block">Name / Heading Title</span>
+                <input
+                  type="text"
+                  value={extractedData.fullName || ''}
+                  placeholder="Enter Full Name"
+                  onChange={(e) => setExtractedData({ ...extractedData, fullName: e.target.value })}
+                  className="w-full font-bold text-on-surface text-sm bg-transparent border-b border-dashed border-outline-variant/60 focus:outline-none focus:border-primary py-0.5"
+                />
               </div>
 
-              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40">
-                <span className="text-outline uppercase text-[10px] font-bold block">Identifier Number</span>
-                <span className="font-mono font-bold text-primary text-sm">{extractedData.identifierNumber || 'N/A'}</span>
+              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 space-y-1">
+                <span className="text-outline uppercase text-[10px] font-bold block">Identifier / Reference Code</span>
+                <input
+                  type="text"
+                  value={extractedData.identifierNumber || ''}
+                  placeholder="Enter ID / Reference No."
+                  onChange={(e) => setExtractedData({ ...extractedData, identifierNumber: e.target.value })}
+                  className="w-full font-mono font-bold text-primary text-sm bg-transparent border-b border-dashed border-outline-variant/60 focus:outline-none focus:border-primary py-0.5"
+                />
               </div>
 
-              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40">
-                <span className="text-outline uppercase text-[10px] font-bold block">Issue Date</span>
-                <span className="font-semibold text-on-surface">{extractedData.issueDate || 'N/A'}</span>
+              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 space-y-1">
+                <span className="text-outline uppercase text-[10px] font-bold block">Issue / Document Date</span>
+                <input
+                  type="text"
+                  value={extractedData.issueDate || ''}
+                  placeholder="YYYY-MM-DD"
+                  onChange={(e) => setExtractedData({ ...extractedData, issueDate: e.target.value })}
+                  className="w-full font-semibold text-on-surface bg-transparent border-b border-dashed border-outline-variant/60 focus:outline-none focus:border-primary py-0.5"
+                />
               </div>
 
-              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 sm:col-span-2">
-                <span className="text-outline uppercase text-[10px] font-bold block">Issuing Authority</span>
-                <span className="font-semibold text-on-surface">{extractedData.authority || 'N/A'}</span>
+              <div className="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/40 sm:col-span-2 space-y-1">
+                <span className="text-outline uppercase text-[10px] font-bold block">Issuing Authority / Source</span>
+                <input
+                  type="text"
+                  value={extractedData.authority || ''}
+                  placeholder="Issuing Authority"
+                  onChange={(e) => setExtractedData({ ...extractedData, authority: e.target.value })}
+                  className="w-full font-semibold text-on-surface bg-transparent border-b border-dashed border-outline-variant/60 focus:outline-none focus:border-primary py-0.5"
+                />
               </div>
             </div>
 

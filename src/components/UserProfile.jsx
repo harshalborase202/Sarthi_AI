@@ -8,6 +8,18 @@ export default function UserProfile({ profile, language, setLanguage }) {
   const t = translations[language] || translations.EN;
 
   const [activeModal, setActiveModal] = useState(null); // 'about' | 'privacy' | null
+  const [userName, setUserName] = useState(() => localStorage.getItem('sarthi_user_name') || 'Harshal Sharma');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(userName);
+
+  const handleSaveName = (e) => {
+    e.preventDefault();
+    if (nameInput.trim()) {
+      setUserName(nameInput.trim());
+      localStorage.setItem('sarthi_user_name', nameInput.trim());
+    }
+    setIsEditingName(false);
+  };
 
   // Map readable label for education
   const getEducationLabel = (val) => {
@@ -36,8 +48,26 @@ export default function UserProfile({ profile, language, setLanguage }) {
           </div>
         </div>
 
-        <div className="space-y-1 relative z-10">
-          <h1 className="text-2xl font-black text-on-surface">Harshal Sharma</h1>
+        <div className="space-y-1 relative z-10 w-full max-w-xs">
+          {isEditingName ? (
+            <form onSubmit={handleSaveName} className="flex gap-2 justify-center items-center">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                className="px-3 py-1 bg-surface border border-primary rounded-xl text-center font-black text-base text-on-surface focus:outline-none"
+                autoFocus
+              />
+              <button type="submit" className="px-3 py-1 bg-primary text-white font-bold text-xs rounded-xl">Save</button>
+            </form>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <h1 className="text-2xl font-black text-on-surface">{userName}</h1>
+              <button onClick={() => setIsEditingName(true)} className="p-1 text-outline hover:text-primary transition-colors">
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           <p className="text-xs text-on-surface-variant font-medium">Verified BharatAI Citizen Account</p>
         </div>
       </div>
@@ -51,11 +81,11 @@ export default function UserProfile({ profile, language, setLanguage }) {
 
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/get-started')}
             className="text-xs font-bold text-primary hover:text-primary-container hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Edit</span>
+            <span>Edit Profile</span>
           </button>
         </div>
 
