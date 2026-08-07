@@ -1,0 +1,85 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        "secondary": "#8f4e00",
+        "on-error-container": "#93000a",
+        "surface-variant": "#e0e3e5",
+        "primary-fixed": "#d6e3ff",
+        "surface-container-lowest": "#ffffff",
+        "tertiary-fixed-dim": "#72de5c",
+        "on-surface-variant": "#43474e",
+        "surface-container-highest": "#e0e3e5",
+        "primary": "#002045",
+        "on-secondary": "#ffffff",
+        "inverse-surface": "#2d3133",
+        "secondary-container": "#fe9832",
+        "on-tertiary-fixed": "#012200",
+        "on-tertiary-container": "#49b538",
+        "on-surface": "#191c1e",
+        "surface": "#f7f9fb",
+        "on-tertiary-fixed-variant": "#035300",
+        "background": "#f7f9fb",
+        "on-primary-fixed": "#001b3c",
+        "on-primary-fixed-variant": "#2d476f",
+        "tertiary-fixed": "#8dfc75",
+        "outline": "#74777f",
+        "on-primary": "#ffffff",
+        "surface-container-high": "#e6e8ea",
+        "tertiary-container": "#024000",
+        "inverse-primary": "#adc7f7",
+        "surface-bright": "#f7f9fb",
+        "secondary-fixed-dim": "#ffb77a",
+        "primary-container": "#1a365d",
+        "primary-fixed-dim": "#adc7f7",
+        "surface-dim": "#d8dadc",
+        "tertiary": "#012800",
+        "on-secondary-container": "#683700",
+        "on-tertiary": "#ffffff",
+        "on-secondary-fixed-variant": "#6d3a00",
+        "inverse-on-surface": "#eff1f3",
+        "error": "#ba1a1a",
+        "on-error": "#ffffff",
+        "surface-container": "#eceef0",
+        "surface-tint": "#455f88",
+        "on-primary-container": "#86a0cd",
+        "secondary-fixed": "#ffdcc2",
+        "on-background": "#191c1e",
+        "outline-variant": "#c4c6cf",
+        "error-container": "#ffdad6",
+        "on-secondary-fixed": "#2e1500",
+        "surface-container-low": "#f2f4f6",
+        // Additional vibrant accents
+        "saffron": "#FF9933",
+        "bharat-green": "#138808"
+      },
+      borderRadius: {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "2xl": "1rem",
+        "full": "9999px"
+      },
+      spacing: {
+        "stack-sm": "8px",
+        "stack-lg": "32px",
+        "gutter": "24px",
+        "container-max": "1280px",
+        "stack-md": "16px",
+        "margin-desktop": "32px",
+        "margin-mobile": "16px"
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        body: ["Inter", "sans-serif"]
+      }
+    },
+  },
+  plugins: [],
+}
