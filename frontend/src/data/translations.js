@@ -1,7 +1,7 @@
 export const translations = {
   EN: {
     appTitle: "SarthiAI",
-    appSubtitle: "BharatAI Government Scheme Navigator & Decision Visualizer",
+    appSubtitle: "SarthiAI Government Scheme Navigator & Decision Visualizer",
     tellUsAbout: "Tell us about yourself",
     subtitleOnboarding: "We need a few details to find the best government schemes for you.",
     ageLabel: "Age",
@@ -70,7 +70,7 @@ export const translations = {
     resetProfile: "Reset Profile Inputs",
     
     // Memory & Privacy Control
-    memoryHeaderTitle: "What should BharatAI remember?",
+    memoryHeaderTitle: "What should SarthiAI remember?",
     memoryHeaderSubtitle: "You control what's saved, for how long, and can change this anytime.",
     rememberEverything: "Remember Everything",
     rememberEverythingSubtext: "Convenient default for faster future scheme searches",
@@ -84,7 +84,7 @@ export const translations = {
   },
   HI: {
     appTitle: "सारथी AI",
-    appSubtitle: "भारत AI सरकारी योजना नेविगेटर एवं निर्णय विज़ुअलाइज़र",
+    appSubtitle: "सारथी AI सरकारी योजना नेविगेटर एवं निर्णय विज़ुअलाइज़र",
     tellUsAbout: "अपने बारे में बताएं",
     subtitleOnboarding: "आपके लिए सर्वोत्तम सरकारी योजनाएं ढूंढने के लिए हमें कुछ विवरण चाहिए।",
     ageLabel: "आयु (वर्ष)",
@@ -167,7 +167,7 @@ export const translations = {
   },
   MR: {
     appTitle: "सारथी AI",
-    appSubtitle: "भारत AI शासकीय योजना नेव्हिगेटर व निर्णय विझुअलायझर",
+    appSubtitle: "सारथी AI शासकीय योजना नेव्हिगेटर व निर्णय विझुअलायझर",
     tellUsAbout: "आपल्याबद्दल माहिती द्या",
     subtitleOnboarding: "आपल्यासाठी सर्वोत्तम शासकीय योजना शोधण्यासाठी आम्हाला काही माहिती हवी आहे.",
     ageLabel: "वय",

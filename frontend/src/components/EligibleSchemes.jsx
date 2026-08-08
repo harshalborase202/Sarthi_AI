@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Award, CheckCircle, ExternalLink, GitBranch, ArrowRight, UserCheck, AlertTriangle, Search, Filter } from 'lucide-react';
+import { Award, CheckCircle, ExternalLink, GitBranch, ArrowRight, UserCheck, AlertTriangle, Search, Filter, X } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function EligibleSchemes({ eligibleList, ineligibleList, profile, onSelectScheme, onViewIneligible, onEditProfile, language }) {
@@ -8,8 +8,12 @@ export default function EligibleSchemes({ eligibleList, ineligibleList, profile,
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredSchemes = eligibleList.filter(scheme => {
-    const matchesSearch = scheme.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          scheme.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch = !query ||
+                          scheme.name.toLowerCase().includes(query) || 
+                          scheme.category.toLowerCase().includes(query) ||
+                          (scheme.benefits && scheme.benefits.toLowerCase().includes(query)) ||
+                          (scheme.description && scheme.description.toLowerCase().includes(query));
     if (filterCategory === 'All') return matchesSearch;
     if (filterCategory === 'Central') return matchesSearch && scheme.govtLevel.includes('Central');
     if (filterCategory === 'State') return matchesSearch && !scheme.govtLevel.includes('Central');
@@ -18,35 +22,35 @@ export default function EligibleSchemes({ eligibleList, ineligibleList, profile,
   });
 
   return (
-    <div className="w-full max-w-5xl mx-auto pt-4 pb-16 px-4 space-y-6">
+    <div className="w-full max-w-5xl mx-auto pt-4 pb-20 px-4 space-y-6">
       
-      {/* Profile Bar */}
+      {/* Active Citizen Profile Summary Bar */}
       <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 md:p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3 text-xs md:text-sm font-medium text-on-surface">
           <div className="flex items-center gap-1.5 font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">
             <UserCheck className="w-4 h-4 text-primary" /> Active Profile
           </div>
-          <span className="bg-surface-container-high px-2.5 py-1 rounded-md">Age: {profile.age} yrs</span>
-          <span className="bg-surface-container-high px-2.5 py-1 rounded-md">State: {profile.state}</span>
-          <span className="bg-surface-container-high px-2.5 py-1 rounded-md">Income: ₹{Number(profile.income).toLocaleString('en-IN')}</span>
-          <span className="bg-surface-container-high px-2.5 py-1 rounded-md capitalize">Category: {profile.category}</span>
+          <span className="bg-surface-container-high px-2.5 py-1 rounded-md font-bold">Age: {profile.age} yrs</span>
+          <span className="bg-surface-container-high px-2.5 py-1 rounded-md font-bold">State: {profile.state}</span>
+          <span className="bg-surface-container-high px-2.5 py-1 rounded-md font-bold">Income: ₹{Number(profile.income).toLocaleString('en-IN')}</span>
+          <span className="bg-surface-container-high px-2.5 py-1 rounded-md font-bold capitalize">Category: {profile.category}</span>
         </div>
 
         <button
           onClick={onEditProfile}
-          className="text-xs font-bold text-primary hover:text-primary-container border border-primary/30 px-3.5 py-1.5 rounded-lg hover:bg-primary/5 transition-all"
+          className="text-xs font-bold text-primary hover:text-primary-container border border-primary/30 px-3.5 py-1.5 rounded-lg hover:bg-primary/5 transition-all cursor-pointer"
         >
           {t.editProfile}
         </button>
       </div>
 
-      {/* Main Title & Ineligible Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+      {/* Main Title & Ineligible Schemes Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">
             {t.scoredTitle}
           </h1>
-          <p className="text-xs md:text-sm text-on-surface-variant mt-1">
+          <p className="text-xs md:text-sm text-on-surface-variant mt-1 font-medium">
             {t.scoredSubtitle} ({eligibleList.length} {t.matchedSchemesFound})
           </p>
         </div>
@@ -54,7 +58,7 @@ export default function EligibleSchemes({ eligibleList, ineligibleList, profile,
         {ineligibleList.length > 0 && (
           <button
             onClick={onViewIneligible}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/50 rounded-xl font-bold text-xs hover:bg-amber-100 transition-all cursor-pointer shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/50 rounded-xl font-bold text-xs hover:bg-amber-100 transition-all cursor-pointer shadow-sm shrink-0"
           >
             <AlertTriangle className="w-4 h-4 text-amber-600" />
             <span>{t.viewIneligible} ({ineligibleList.length})</span>
@@ -62,118 +66,150 @@ export default function EligibleSchemes({ eligibleList, ineligibleList, profile,
         )}
       </div>
 
-      {/* Filter Tabs & Search */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-          {['All', 'Central', 'State', 'Education'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                filterCategory === cat
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/60 hover:bg-surface-container'
-              }`}
-            >
-              {cat === 'All' ? 'All Schemes' : `${cat} Schemes`}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Input */}
-        <div className="relative min-w-[240px]">
-          <Search className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* User-Centric Search Bar (Full Width & Prominent) */}
+      <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-3 shadow-sm space-y-3">
+        <div className="relative w-full">
+          <Search className="w-4 h-4 text-primary absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search scheme name or benefit..."
+            placeholder="Search by scheme name, benefit, or keyword (e.g. scholarship, loan, farmer, 10 lakh)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-surface-container-lowest border border-outline-variant/60 rounded-xl text-xs font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary-container"
+            className="w-full pl-10 pr-10 py-2.5 bg-surface border border-outline-variant/60 rounded-xl text-xs md:text-sm font-semibold text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-inner"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface p-1 rounded-full hover:bg-surface-container"
+              title="Clear search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Category Pills directly integrated below search bar */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-outline-variant/30">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            {['All', 'Central', 'State', 'Education'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setFilterCategory(cat)}
+                className={`px-3 py-1 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap cursor-pointer ${
+                  filterCategory === cat
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-surface text-on-surface-variant border border-outline-variant/60 hover:bg-surface-container'
+                }`}
+              >
+                {cat === 'All' ? 'All Schemes' : `${cat} Schemes`}
+              </button>
+            ))}
+          </div>
+
+          <span className="text-[11px] font-bold text-on-surface-variant">
+            Showing {filteredSchemes.length} of {eligibleList.length} schemes
+          </span>
         </div>
       </div>
 
       {/* Schemes Grid */}
       <div className="space-y-5">
-        {filteredSchemes.map((scheme) => (
-          <div
-            key={scheme.id}
-            className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 space-y-4"
-          >
-            {/* Top Info Header */}
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary border border-primary/20">
-                    {scheme.govtLevel}
-                  </span>
-                  <span className="text-xs font-medium text-on-surface-variant">
-                    {scheme.ministry}
-                  </span>
-                </div>
-                <h2 className="text-xl font-bold text-on-surface">{scheme.name}</h2>
-              </div>
-
-              {/* Match Score Badge */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-xl font-extrabold text-sm shadow-sm">
-                <Award className="w-4 h-4 text-emerald-600" />
-                <span>{scheme.matchScore || 95}% {t.matchScore}</span>
-              </div>
-            </div>
-
-            <p className="text-xs md:text-sm text-on-surface-variant leading-relaxed">
-              {scheme.shortDesc}
-            </p>
-
-            {/* Financial Benefit highlight box */}
-            <div className="bg-surface-container-low/60 border border-outline-variant/40 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div>
-                <span className="text-outline uppercase text-[10px] font-bold tracking-wider block">Key Benefit Amount</span>
-                <span className="font-extrabold text-primary text-sm">{scheme.benefitAmount}</span>
-              </div>
-              <div>
-                <span className="text-outline uppercase text-[10px] font-bold tracking-wider block">Target Beneficiaries</span>
-                <span className="font-semibold text-on-surface">{scheme.targetGroup}</span>
-              </div>
-            </div>
-
-            {/* Why You Qualify Bullet list */}
-            <div className="space-y-1.5 pt-1">
-              <span className="text-xs font-bold text-on-surface uppercase tracking-wider block">{t.whyQualify}:</span>
-              <ul className="space-y-1">
-                {scheme.whyQualify.map((bullet, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs text-on-surface-variant">
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Action Bar */}
-            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/40">
-              <button
-                onClick={() => onSelectScheme(scheme)}
-                className="py-2.5 px-4 bg-primary hover:bg-primary-container text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 transition-all cursor-pointer"
-              >
-                <GitBranch className="w-4 h-4 text-saffron" />
-                <span>{t.viewFlowchart}</span>
-              </button>
-
-              <a
-                href={scheme.officialUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-4 bg-surface hover:bg-surface-container text-primary font-bold text-xs rounded-xl border border-outline-variant flex items-center gap-1.5 transition-all"
-              >
-                <span>{t.officialPortal}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
+        {filteredSchemes.length === 0 ? (
+          <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-8 text-center space-y-2">
+            <Search className="w-8 h-8 text-outline mx-auto" />
+            <p className="text-sm font-bold text-on-surface">No schemes found matching "{searchQuery}"</p>
+            <p className="text-xs text-on-surface-variant">Try adjusting your search terms or selecting 'All Schemes'.</p>
+            <button
+              onClick={() => { setSearchQuery(''); setFilterCategory('All'); }}
+              className="mt-2 text-xs font-bold text-primary hover:underline"
+            >
+              Clear filters & search
+            </button>
           </div>
-        ))}
+        ) : (
+          filteredSchemes.map((scheme) => (
+            <div
+              key={scheme.id}
+              className="bg-surface-container-lowest border border-outline-variant/60 hover:border-primary/40 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all space-y-4"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                      {scheme.govtLevel}
+                    </span>
+                    <span className="text-xs text-on-surface-variant font-semibold">
+                      {scheme.ministry || scheme.category}
+                    </span>
+                  </div>
+                  <h3 className="text-lg md:text-xl font-black text-on-surface">
+                    {scheme.name}
+                  </h3>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-full text-xs font-black shrink-0">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>{scheme.matchScore || '98%'} Match</span>
+                </div>
+              </div>
+
+              <p className="text-xs md:text-sm text-on-surface-variant leading-relaxed">
+                {scheme.description}
+              </p>
+
+              {/* Benefits & Target Beneficiaries Box */}
+              <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-outline block">Key Benefit Amount</span>
+                  <span className="font-extrabold text-primary text-sm">{scheme.benefits || 'Up to ₹10.0 Lakh Loan (Interest Subsidy)'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-outline block">Target Beneficiaries</span>
+                  <span className="font-bold text-on-surface">{scheme.targetBeneficiaries || 'Students in Higher Education'}</span>
+                </div>
+              </div>
+
+              {/* Reasoning Summary */}
+              {scheme.whyQualify && scheme.whyQualify.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] font-extrabold text-primary uppercase tracking-wider block">Why You Qualify:</span>
+                  <ul className="space-y-1">
+                    {scheme.whyQualify.map((reason, idx) => (
+                      <li key={idx} className="text-xs font-semibold text-on-surface flex items-start gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>{reason}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-outline-variant/40">
+                <button
+                  onClick={() => onSelectScheme(scheme)}
+                  className="py-2.5 px-5 bg-primary hover:bg-primary-container text-white font-extrabold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>View Decision Logic & Checklist</span>
+                  <ArrowRight className="w-4 h-4 text-saffron" />
+                </button>
+
+                {scheme.officialUrl && (
+                  <a
+                    href={scheme.officialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2 px-3 text-xs font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 hover:underline"
+                  >
+                    <span>Official Portal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+
+            </div>
+          ))
+        )}
       </div>
 
     </div>

@@ -1,14 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Globe, Sparkles, Info } from 'lucide-react';
+import { ShieldCheck, Globe, Info, User, LogOut } from 'lucide-react';
 import { translations } from '../data/translations';
+import Auth from './Auth';
 
 export default function Header({ language, setLanguage, onReset, currentScreen, setScreen }) {
   const navigate = useNavigate();
   const t = translations[language] || translations.EN;
+  
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [userSession, setUserSession] = useState(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sarthi_user');
+      if (stored) {
+        setUserSession(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Session load error:', e);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('sarthi_user');
+    setUserSession(null);
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-8 h-16 bg-surface dark:bg-surface-container-low border-b border-outline-variant shadow-sm">
+      
+      {/* Brand Title & Subtitle */}
       <div 
         className="flex items-center gap-3 cursor-pointer select-none"
         onClick={onReset}
@@ -33,24 +55,40 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
         </div>
       </div>
 
+      {/* Top Right Header Controls (Log In Button ON LEFT of Language Selector, matching myScheme.gov.in) */}
       <div className="flex items-center gap-3">
-        {/* Ask AI Chatbot Button */}
-        <button
-          onClick={() => navigate('/chatbot')}
-          className="hidden sm:flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary dark:text-primary-fixed border border-primary/20 font-bold text-xs px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-saffron animate-pulse" />
-          <span>Ask AI Chatbot</span>
-        </button>
+        
+        {/* User Auth Session / Log In Button (POSITIONED ON THE LEFT) */}
+        {userSession ? (
+          <div className="flex items-center gap-1.5 bg-surface-container-high text-primary border border-outline-variant/60 px-3 py-1 rounded-xl text-xs font-bold shadow-sm">
+            <User className="w-3.5 h-3.5 text-saffron" />
+            <span className="truncate max-w-[110px]">{userSession.name}</span>
+            <button
+              onClick={handleLogout}
+              className="ml-1 text-on-surface-variant hover:text-rose-600 transition-colors cursor-pointer"
+              title="Log Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white font-extrabold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+          >
+            <User className="w-3.5 h-3.5 text-saffron" />
+            <span>Log In</span>
+          </button>
+        )}
 
-        {/* Language Selector Toggle */}
+        {/* Multilingual Selector Toggle (POSITIONED ON THE RIGHT) */}
         <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant text-xs font-semibold">
           <Globe className="w-4 h-4 text-on-surface-variant ml-1 mr-1.5" />
           <button
             onClick={() => setLanguage('EN')}
             className={`px-2.5 py-1 rounded-md transition-all ${
               language === 'EN'
-                ? 'bg-primary text-white shadow-sm'
+                ? 'bg-primary text-white shadow-sm font-bold'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -60,7 +98,7 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
             onClick={() => setLanguage('HI')}
             className={`px-2.5 py-1 rounded-md transition-all ${
               language === 'HI'
-                ? 'bg-primary text-white shadow-sm'
+                ? 'bg-primary text-white shadow-sm font-bold'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
@@ -70,14 +108,27 @@ export default function Header({ language, setLanguage, onReset, currentScreen, 
             onClick={() => setLanguage('MR')}
             className={`px-2.5 py-1 rounded-md transition-all ${
               language === 'MR'
-                ? 'bg-primary text-white shadow-sm'
+                ? 'bg-primary text-white shadow-sm font-bold'
                 : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             मराठी
           </button>
         </div>
+
       </div>
+
+      {/* Auth Modal Overlay */}
+      {showAuthModal && (
+        <Auth
+          language={language}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={(session, newProfile) => {
+            setUserSession(session);
+            if (setScreen) setScreen('authenticated', newProfile);
+          }}
+        />
+      )}
     </header>
   );
 }

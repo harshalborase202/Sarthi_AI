@@ -15,6 +15,8 @@ import MemoryCenter from './components/MemoryCenter';
 import UserProfile from './components/UserProfile';
 import LandingPage from './components/LandingPage';
 import SchemeChatbot from './components/SchemeChatbot';
+import FloatingChatbot from './components/FloatingChatbot';
+import Auth from './components/Auth';
 import { evaluateProfile } from './data/schemes';
 
 function AppContent() {
@@ -22,25 +24,22 @@ function AppContent() {
   const location = useLocation();
   const [language, setLanguage] = useState('EN');
 
-  // Load profile from localStorage if saved, else default
-  const DEFAULT_PROFILE = {
-    age: '22',
-    gender: 'female',
-    state: 'Maharashtra',
-    occupation: 'student',
-    income: '250000',
-    category: 'sc',
-    education: 'graduate',
-    disability: 'no'
-  };
-
+  // Pre-filled defaults matching demo script in README
   const [profile, setProfile] = useState(() => {
     try {
-      const saved = localStorage.getItem('sarthi_user_profile');
-      return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
-    } catch (e) {
-      return DEFAULT_PROFILE;
-    }
+      const stored = localStorage.getItem('sarthi_profile') || localStorage.getItem('sarthi_user_profile');
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return {
+      age: '22',
+      gender: 'female',
+      state: 'Maharashtra',
+      occupation: 'student',
+      income: '250000',
+      category: 'sc',
+      education: 'graduate',
+      disability: 'no'
+    };
   });
 
   const [evaluationResult, setEvaluationResult] = useState(() => evaluateProfile(profile));
@@ -48,7 +47,7 @@ function AppContent() {
   const [selectedScheme, setSelectedScheme] = useState(null);
 
   const handleProfileSubmit = () => {
-    localStorage.setItem('sarthi_user_profile', JSON.stringify(profile));
+    localStorage.setItem('sarthi_profile', JSON.stringify(profile));
     const result = evaluateProfile(profile);
     setEvaluationResult(result);
     navigate('/reasoning');
@@ -68,11 +67,19 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-on-background flex flex-col font-sans relative">
       <Header 
         language={language} 
         setLanguage={setLanguage}
         onReset={handleReset}
+        currentScreen="active"
+        setScreen={(scr, newProfile) => {
+          if (scr === 'authenticated' && newProfile) {
+            setProfile(prev => ({ ...prev, ...newProfile }));
+            setEvaluationResult(evaluateProfile({ ...profile, ...newProfile }));
+          } else if (scr === 'profile') navigate('/get-started');
+          else if (scr === 'eligible') navigate('/services');
+        }}
       />
 
       <main className="flex-1 pb-24 md:pb-8 pt-20">
@@ -143,6 +150,10 @@ function AppContent() {
             element={<AdPamphletScanner language={language} />} 
           />
           <Route 
+            path="/verify" 
+            element={<DocumentUpload language={language} profile={profile} setProfile={setProfile} />} 
+          />
+          <Route 
             path="/chatbot" 
             element={<SchemeChatbot profile={profile} language={language} />} 
           />
@@ -161,6 +172,7 @@ function AppContent() {
                 profile={profile}
                 setProfile={setProfile}
                 language={language}
+                setLanguage={setLanguage}
               />
             } 
           />
@@ -172,8 +184,15 @@ function AppContent() {
             path="/settings" 
             element={<ProfileSettings language={language} />} 
           />
+          <Route 
+            path="/auth" 
+            element={<Auth language={language} />} 
+          />
         </Routes>
       </main>
+
+      {/* Global Floating AI Chatbot (Anchored Bottom-Right, matching myScheme.gov.in) */}
+      <FloatingChatbot language={language} profile={profile} />
 
       {selectedScheme && (
         <SchemeDetailModal 

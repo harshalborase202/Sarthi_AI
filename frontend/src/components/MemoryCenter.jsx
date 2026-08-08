@@ -180,13 +180,13 @@ export default function MemoryCenter({ language }) {
       {/* Header Section */}
       <div className="bg-gradient-to-r from-primary via-primary-container to-secondary text-white p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden space-y-2">
         <div className="inline-flex items-center gap-1.5 bg-saffron text-primary font-black text-xs px-3 py-1 rounded-full shadow-sm">
-          <Brain className="w-4 h-4" /> BharatAI Memory Center
+          <Brain className="w-4 h-4" /> SarthiAI Memory Center
         </div>
-        <h1 className="text-2xl md:text-3xl font-black tracking-tight">
-          Your Memory, Your Choice
+        <h1 className="text-2xl md:text-3xl font-black text-on-surface">
+          {t.memoryHeaderTitle || "What should SarthiAI remember?"}
         </h1>
-        <p className="text-xs md:text-sm text-slate-200 leading-relaxed max-w-xl">
-          Here's everything BharatAI has asked to remember, and what you decided.
+        <p className="text-xs md:text-sm text-on-surface-variant max-w-xl mx-auto">
+          Here's everything SarthiAI has asked to remember, and what you decided.
         </p>
       </div>
 

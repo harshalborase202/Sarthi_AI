@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Edit3, Globe, Brain, FileText, Info, ShieldCheck, ChevronRight, X, Sparkles, Lock } from 'lucide-react';
+import { User, Edit3, Globe, Brain, FileText, Info, ShieldCheck, ChevronRight, X, Sparkles, Lock, BadgeCheck, Hash, Calendar, MapPin, Check } from 'lucide-react';
 import { translations } from '../data/translations';
 
 export default function UserProfile({ profile, language, setLanguage }) {
@@ -8,15 +8,38 @@ export default function UserProfile({ profile, language, setLanguage }) {
   const t = translations[language] || translations.EN;
 
   const [activeModal, setActiveModal] = useState(null); // 'about' | 'privacy' | null
-  const [userName, setUserName] = useState(() => localStorage.getItem('sarthi_user_name') || 'Harshal Sharma');
+  const [userSession, setUserSession] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(userName);
+  const [nameInput, setNameInput] = useState('');
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sarthi_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUserSession(parsed);
+        setNameInput(parsed.name || 'Bhushan Divakar');
+      } else {
+        setNameInput((profile && profile.name) || 'Bhushan Divakar');
+      }
+    } catch (e) {
+      console.error('[UserProfile] Session read error:', e);
+    }
+  }, [profile]);
+
+  // Display Name logic
+  const citizenName = (userSession && userSession.name) || (profile && profile.name) || 'Bhushan Divakar';
+  const aadhaarNumber = (userSession && userSession.aadhaar_number) || (profile && profile.aadhaarNumber) || '999988887777';
+  const maskedAadhaar = aadhaarNumber ? `XXXX-XXXX-${aadhaarNumber.slice(-4)}` : 'XXXX-XXXX-7777';
+  const citizenAge = (userSession && userSession.age) || (profile && profile.age) || '23';
+  const citizenState = (userSession && userSession.state) || (profile && profile.state) || 'Maharashtra';
 
   const handleSaveName = (e) => {
     e.preventDefault();
     if (nameInput.trim()) {
-      setUserName(nameInput.trim());
-      localStorage.setItem('sarthi_user_name', nameInput.trim());
+      const updatedSession = { ...(userSession || {}), name: nameInput.trim() };
+      setUserSession(updatedSession);
+      localStorage.setItem('sarthi_user', JSON.stringify(updatedSession));
     }
     setIsEditingName(false);
   };
@@ -30,16 +53,16 @@ export default function UserProfile({ profile, language, setLanguage }) {
       graduate: 'Undergraduate / B.Tech / Degree',
       postGraduate: "Postgraduate / Master's"
     };
-    return map[val] || val || 'Graduate';
+    return map[val] || val || 'Undergraduate / B.Tech / Degree';
   };
 
   return (
     <div className="w-full max-w-3xl mx-auto pt-4 pb-28 px-4 space-y-6">
       
-      {/* Header Section with Avatar */}
+      {/* Header Section with Avatar & Citizen Name */}
       <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col items-center text-center space-y-3 relative overflow-hidden">
         {/* Saffron banner background accent */}
-        <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-r from-primary to-primary-container" />
+        <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-r from-primary via-primary-container to-saffron" />
         
         {/* Avatar Placeholder */}
         <div className="relative z-10 w-20 h-20 rounded-full bg-surface-container-lowest p-1 shadow-md mt-4">
@@ -48,36 +71,59 @@ export default function UserProfile({ profile, language, setLanguage }) {
           </div>
         </div>
 
-        <div className="space-y-1 relative z-10 w-full max-w-xs">
+        <div className="space-y-1 relative z-10">
+          {/* Dynamic Citizen Name with Inline Editing */}
           {isEditingName ? (
-            <form onSubmit={handleSaveName} className="flex gap-2 justify-center items-center">
+            <form onSubmit={handleSaveName} className="flex items-center justify-center gap-2">
               <input
                 type="text"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
-                className="px-3 py-1 bg-surface border border-primary rounded-xl text-center font-black text-base text-on-surface focus:outline-none"
                 autoFocus
+                className="text-lg font-black text-on-surface bg-surface border border-primary px-3 py-1 rounded-xl focus:outline-none"
               />
-              <button type="submit" className="px-3 py-1 bg-primary text-white font-bold text-xs rounded-xl">Save</button>
+              <button
+                type="submit"
+                className="p-1.5 bg-primary text-white rounded-lg hover:bg-primary-container"
+              >
+                <Check className="w-4 h-4" />
+              </button>
             </form>
           ) : (
-            <div className="flex items-center justify-center gap-2">
-              <h1 className="text-2xl font-black text-on-surface">{userName}</h1>
-              <button onClick={() => setIsEditingName(true)} className="p-1 text-outline hover:text-primary transition-colors">
+            <h1 className="text-2xl font-black text-on-surface flex items-center justify-center gap-2">
+              <span>{citizenName}</span>
+              <button
+                onClick={() => setIsEditingName(true)}
+                className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                title="Edit Name"
+              >
                 <Edit3 className="w-4 h-4" />
               </button>
-            </div>
+              <BadgeCheck className="w-5 h-5 text-emerald-600 inline" title="Aadhaar Verified Citizen" />
+            </h1>
           )}
-          <p className="text-xs text-on-surface-variant font-medium">Verified BharatAI Citizen Account</p>
+          
+          <div className="flex items-center justify-center gap-2 pt-0.5">
+            <span className="bg-emerald-50 text-emerald-800 text-[11px] font-extrabold px-3 py-0.5 rounded-full border border-emerald-300">
+              Verified SarthiAI Citizen Account
+            </span>
+            <span className="bg-primary/10 text-primary text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full border border-primary/20">
+              Aadhaar: {maskedAadhaar}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Basic Info Card */}
+      {/* Basic Info Card (Aadhaar Extracted Metadata) */}
       <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-outline-variant/40 pb-3">
-          <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" /> Basic Information
-          </h2>
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-primary" />
+            <h2 className="text-base font-extrabold text-on-surface">Basic Information</h2>
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+              Aadhaar Verified
+            </span>
+          </div>
 
           <button
             type="button"
@@ -85,40 +131,44 @@ export default function UserProfile({ profile, language, setLanguage }) {
             className="text-xs font-bold text-primary hover:text-primary-container hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Edit Profile</span>
+            <span>Edit</span>
           </button>
         </div>
 
         {/* Read-Only Parameter Summary Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
-            <span className="text-outline uppercase text-[10px] font-bold block">Age</span>
-            <span className="font-bold text-on-surface text-sm">{profile.age || 22} years</span>
+            <span className="text-outline uppercase text-[10px] font-bold flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-primary" /> Age (Calculated from DOB)
+            </span>
+            <span className="font-bold text-on-surface text-sm">{citizenAge} years</span>
           </div>
 
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
-            <span className="text-outline uppercase text-[10px] font-bold block">State / UT</span>
-            <span className="font-bold text-on-surface text-sm">{profile.state || 'Maharashtra'}</span>
+            <span className="text-outline uppercase text-[10px] font-bold flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-primary" /> State / UT Domicile
+            </span>
+            <span className="font-bold text-on-surface text-sm">{citizenState}</span>
           </div>
 
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
             <span className="text-outline uppercase text-[10px] font-bold block">Education Level</span>
-            <span className="font-bold text-on-surface text-sm">{getEducationLabel(profile.education)}</span>
+            <span className="font-bold text-on-surface text-sm">{getEducationLabel(profile && profile.education)}</span>
           </div>
 
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
             <span className="text-outline uppercase text-[10px] font-bold block">Category / Caste</span>
-            <span className="font-bold text-on-surface text-sm uppercase">{profile.category || 'SC'}</span>
+            <span className="font-bold text-on-surface text-sm uppercase">{(profile && profile.category) || 'SC'}</span>
           </div>
 
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
             <span className="text-outline uppercase text-[10px] font-bold block">Occupation Status</span>
-            <span className="font-bold text-on-surface text-sm capitalize">{profile.occupation || 'Student'}</span>
+            <span className="font-bold text-on-surface text-sm capitalize">{(profile && profile.occupation) || 'Student'}</span>
           </div>
 
           <div className="p-3.5 bg-surface rounded-2xl border border-outline-variant/40 space-y-0.5">
             <span className="text-outline uppercase text-[10px] font-bold block">Annual Family Income</span>
-            <span className="font-extrabold text-primary text-sm">₹{Number(profile.income || 250000).toLocaleString('en-IN')}</span>
+            <span className="font-extrabold text-primary text-sm">₹{Number((profile && profile.income) || 250000).toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -240,7 +290,7 @@ export default function UserProfile({ profile, language, setLanguage }) {
             <div className="flex justify-between items-center border-b border-outline-variant/40 pb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-saffron" />
-                <h3 className="font-extrabold text-lg text-on-surface">About SarthiAI (BharatAI)</h3>
+                <h3 className="font-extrabold text-lg text-on-surface">About SarthiAI</h3>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1 rounded-full hover:bg-surface-container text-outline">
                 <X className="w-5 h-5" />

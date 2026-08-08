@@ -2,12 +2,37 @@
   "name": "sarthi-ai-workspace",
   "version": "1.0.0",
   "private": true,
-  "description": "Sarthi AI (BharatAI) Workspace - Root Launcher",
+  "description": "Sarthi AI Workspace - Root Launcher",
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "build": "npm run build --prefix frontend",
     "start": "npm run dev --prefix frontend",
     "dev:backend": "cd backend && venv\\Scripts\\python.exe -m uvicorn main:app --reload --port 8000",
     "dev:node": "cd backend/node && npm run dev"
+  },
+  "dependencies": {
+    "@google/genai": "^2.16.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "firebase": "^12.17.1",
+    "firebase-admin": "^14.2.0",
+    "framer-motion": "^11.18.2",
+    "fuse.js": "^7.5.0",
+    "lucide-react": "^0.474.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.2",
+    "recharts": "^2.15.1",
+    "sqlite3": "^6.0.1",
+    "tailwind-merge": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "vite": "5.4.14"
   }
 }

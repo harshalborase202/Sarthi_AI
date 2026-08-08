@@ -48,7 +48,7 @@ export default function LandingPage({ language }) {
     <div className="w-full min-h-screen bg-[#F4F6F9] text-on-background select-none font-sans pb-24 relative bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px]">
       
       {/* Official Top Announcement Strip (Tricolor Accent) */}
-      <div className="bg-[#0A1A2F] text-white text-[11px] py-2 px-4 flex justify-between items-center border-b-2 border-saffron shadow-sm relative z-50">
+      <div className="bg-[#0A1A2F] text-white text-[11px] py-2 px-4 flex justify-between items-center border-b-2 border-saffron shadow-sm relative z-30">
         <div className="flex items-center gap-3 max-w-6xl mx-auto w-full">
           <div className="flex items-center gap-1 bg-saffron/20 text-saffron px-2.5 py-0.5 rounded font-black">
             <span>🇮🇳</span> भारत सरकार
@@ -76,7 +76,7 @@ export default function LandingPage({ language }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl md:text-2xl font-black text-primary tracking-tight">सारथी AI • SarthiAI</span>
+                <span className="text-xl md:text-2xl font-black text-primary tracking-tight">SarthiAI</span>
                 <span className="bg-saffron/15 text-saffron text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-saffron/30">
                   Official Portal
                 </span>
@@ -88,7 +88,7 @@ export default function LandingPage({ language }) {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20">
               <Landmark className="w-4 h-4 text-saffron" />
-              <span>BharatAI Initiative</span>
+              <span>SarthiAI Initiative</span>
             </div>
 
             <motion.button
@@ -121,16 +121,6 @@ export default function LandingPage({ language }) {
             
             {/* Left Content */}
             <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-300 font-extrabold text-xs px-4 py-1.5 rounded-full shadow-sm"
-              >
-                <Award className="w-4 h-4 text-emerald-600" />
-                <span>PS01 & PS03 Trustworthy AI Framework</span>
-              </motion.div>
-
               <h1 className="text-3xl md:text-5xl font-black text-primary leading-tight tracking-tight">
                 Discover every government scheme you qualify for — <span className="text-saffron">transparently & instantly.</span>
               </h1>
@@ -190,7 +180,7 @@ export default function LandingPage({ language }) {
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-extrabold text-primary flex items-center gap-1">
-                      <ShieldCheck className="w-4 h-4 text-saffron" /> BharatAI Verified
+                      <ShieldCheck className="w-4 h-4 text-saffron" /> SarthiAI Verified
                     </span>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                       Live Processing
@@ -415,7 +405,7 @@ export default function LandingPage({ language }) {
         {/* Official Portal Footer Disclaimer */}
         <footer className="border-t border-outline-variant/60 pt-6 text-center text-xs text-on-surface-variant space-y-2">
           <p className="font-extrabold text-primary">
-            SarthiAI is a guidance platform designed under the BharatAI framework. All scheme applications redirect to official portal domains (.gov.in / .nic.in).
+            SarthiAI is a guidance platform designed under the SarthiAI framework. All scheme applications redirect to official portal domains (.gov.in / .nic.in).
           </p>
           <p className="text-[11px] opacity-75">
             © 2026 SarthiAI • Government Scheme Navigator & Decision Transparency Portal

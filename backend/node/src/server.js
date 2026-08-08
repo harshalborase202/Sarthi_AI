@@ -26,6 +26,7 @@ const cors = require('cors');
 
 const scoreRouter = require('./routes/score');
 const healthRouter = require('./routes/health');
+const authRouter = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -61,6 +62,7 @@ const scanRouter = require('./routes/scan');
 app.use('/', healthRouter);
 app.use('/api/score', scoreRouter);
 app.use('/api/scan', scanRouter);
+app.use('/api/auth', authRouter);
 
 // Also mount OCR at /api/ocr-scan to match frontend's direct fetch('/api/ocr-scan')
 const { ocrRateLimiter } = require('./middleware/rateLimiter');
