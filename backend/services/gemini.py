@@ -107,6 +107,24 @@ def generate_offline_scheme_answer(message: str, profile: dict | None = None, la
     alts = [s for s in SCHEMES_DATABASE if s.get("id") != primary.get("id")]
     alt_lines = "\n".join([f"  ⭐ **{s['name']}** ({s.get('benefitAmount')})" for s in alts[:3]])
 
+    if language == "MR":
+        status_str = "✅ **अभिनंदन! तुम्ही या योजनेसाठी पात्र आहात**" if is_eligible else "⚠️ **तुम्ही सध्या या योजनेसाठी पात्र नाही आहात**"
+        fail_str = "\n".join([f"  ❌ {r}" for r in reasons_fail]) if reasons_fail else "  ✅ सर्व मुख्य अटी पूर्ण आहेत"
+        pass_str = "\n".join([f"  ✅ {r}" for r in reasons_pass])
+        
+        resp = f"🌾 **{primary.get('name')} — संक्षिप्त सारांश**\n\n"
+        resp += f"💰 **आर्थिक मदत**: {primary.get('benefitAmount')}\n"
+        resp += f"ℹ️ **माहिती**: {primary.get('shortDesc')}\n\n"
+        resp += f"👤 **तुमच्या प्रोफाईलनुसार**:\n  व्यवसाय: {p_occ.capitalize()} | राज्य: {p_state} | वार्षिक उत्पन्न: ₹{int(p_income):,}\n\n"
+        resp += f"🚦 **सद्यस्थिती**: {status_str}\n\n"
+        resp += f"❓ **कारण (Eligibility Breakdown)**:\n{pass_str}\n{fail_str}\n\n"
+        resp += f"📄 **आवश्यक कागदपत्रे**:\n{doc_lines}\n\n"
+        resp += f"💡 **सोप्या शब्दांत (AI Simplifier)**:\n\"ही योजना सरकारी निकष पूर्ण करणाऱ्या पात्र नागरिकांसाठी आहे.\"\n\n"
+        resp += f"🟢 **अधिकृत संकेतस्थळ**: {primary.get('officialUrl')} (सत्यापित: आज | 98% AI Confidence)\n\n"
+        if not is_eligible:
+            resp += f"🤖 **Sarthi AI कडून इतर शिफारसी (तुमच्या प्रोफाईलनुसार योग्य योजना)**:\n{alt_lines}\n"
+        return resp
+
     if language == "HI":
         status_str = "✅ **बधाई हो! आप पात्र हैं**" if is_eligible else "⚠️ **आप वर्तमान में पात्र नहीं हैं**"
         fail_str = "\n".join([f"  ❌ {r}" for r in reasons_fail]) if reasons_fail else "  ✅ सभी मुख्य नियम पूर्ण हैं"
@@ -156,7 +174,13 @@ async def chat_with_gemini(
     if profile:
         context = f"\nUser profile context: Age={profile.get('age')}, State={profile.get('state')}, Income=₹{profile.get('income')}, Category={profile.get('category', '').upper()}, Education={profile.get('education')}, Occupation={profile.get('occupation')}, Gender={profile.get('gender')}.\n"
     
-    lang_instruction = "Please respond in Hindi." if language == "HI" else "Please respond in English."
+    if language == "MR":
+        lang_instruction = "IMPORTANT: Please respond in fluent Marathi (मराठी). Structure your answer into clear, scan-able card sections with emojis (🌾 Scheme Summary, 👤 Based on Profile, 🚦 Current Status, 📄 Required Documents, 💡 In Simple Words, 🟢 Official Source)."
+    elif language == "HI":
+        lang_instruction = "IMPORTANT: Please respond in fluent Hindi (हिंदी). Structure your answer into clear, scan-able card sections with emojis (🌾 Scheme Summary, 👤 Based on Profile, 🚦 Current Status, 📄 Required Documents, 💡 In Simple Words, 🟢 Official Source)."
+    else:
+        lang_instruction = "IMPORTANT: Please respond in English. Structure your answer into clear, scan-able card sections with emojis."
+
     full_message = f"{context}{lang_instruction}\n\nUser question: {message}"
 
     # Build chat history

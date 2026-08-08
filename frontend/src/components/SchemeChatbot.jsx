@@ -85,28 +85,160 @@ export default function SchemeChatbot({ profile, language }) {
       .trim();
   };
 
-  // Speak out text via Web Speech Synthesis
-  const speakText = (msgId, textToSpeak) => {
-    if (!('speechSynthesis' in window)) return;
+  // Audio player ref for streaming Marathi / Hindi speech
+  const audioRef = useRef(null);
 
-    if (currentlySpeakingId === msgId) {
-      window.speechSynthesis.cancel();
+  // Available browser speech voices
+  const [voices, setVoices] = useState([]);
+
+  useEffect(() => {
+    const updateVoices = () => {
+      if ('speechSynthesis' in window) {
+        setVoices(window.speechSynthesis.getVoices());
+      }
+    };
+    updateVoices();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+    }
+  }, []);
+
+  // Find best native voice for WebSpeech fallback
+  const findBestVoice = (targetLang) => {
+    const available = voices.length > 0 ? voices : ('speechSynthesis' in window ? window.speechSynthesis.getVoices() : []);
+    if (!available || available.length === 0) return null;
+
+    if (targetLang === 'MR') {
+      const marathiVoice = available.find(v => 
+        v.lang.toLowerCase().startsWith('mr') || 
+        v.name.toLowerCase().includes('marathi') || 
+        v.name.includes('मराठी')
+      );
+      if (marathiVoice) return marathiVoice;
+
+      const hindiVoice = available.find(v => 
+        v.lang.toLowerCase().startsWith('hi') || 
+        v.name.toLowerCase().includes('hindi') || 
+        v.name.includes('हिंदी')
+      );
+      if (hindiVoice) return hindiVoice;
+    }
+
+    if (targetLang === 'HI') {
+      const hindiVoice = available.find(v => 
+        v.lang.toLowerCase().startsWith('hi') || 
+        v.name.toLowerCase().includes('hindi') || 
+        v.name.includes('हिंदी')
+      );
+      if (hindiVoice) return hindiVoice;
+    }
+
+    const indianVoice = available.find(v => 
+      v.lang.toLowerCase().includes('in') || 
+      v.name.toLowerCase().includes('india')
+    );
+    if (indianVoice) return indianVoice;
+
+    return null;
+  };
+
+  // Detect input text language dynamically (Marathi vs Hindi vs English)
+  const detectLanguage = (text) => {
+    if (!text) return language || 'EN';
+    const marathiKeywords = ['आहे', 'नाही', 'योजना', 'पात्रता', 'फायदे', 'नमस्कार', 'कागदपत्रे', 'कोणत्या', 'मिळेल', 'सांगा', 'करावे', 'योजनेचे', 'योजनेची'];
+    const hindiKeywords = ['है', 'नहीं', 'योजनाएं', 'पात्रता', 'लाभ', 'नमस्ते', 'दस्तावेज', 'कौनसी', 'मिलेगा', 'बताओ', 'चाहिए'];
+
+    if (marathiKeywords.some(kw => text.includes(kw))) return 'MR';
+    if (hindiKeywords.some(kw => text.includes(kw))) return 'HI';
+
+    if (/[\u0900-\u097F]/.test(text)) {
+      return language === 'MR' ? 'MR' : 'HI';
+    }
+
+    return language || 'EN';
+  };
+
+  // WebSpeech Engine Fallback
+  const speakWebSpeech = (msgId, textSnippet, activeLang) => {
+    if (!('speechSynthesis' in window)) {
       setCurrentlySpeakingId(null);
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const cleaned = cleanTextForSpeech(textToSpeak);
-    const utterance = new SpeechSynthesisUtterance(cleaned);
+    const utterance = new SpeechSynthesisUtterance(textSnippet);
+    utterance.lang = activeLang === 'HI' ? 'hi-IN' : activeLang === 'MR' ? 'mr-IN' : 'en-IN';
 
-    utterance.lang = language === 'HI' ? 'hi-IN' : language === 'MR' ? 'mr-IN' : 'en-IN';
-    utterance.rate = 0.95; // Clear natural speed
+    const matchedVoice = findBestVoice(activeLang);
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+    }
 
+    utterance.rate = 0.92;
     utterance.onend = () => setCurrentlySpeakingId(null);
     utterance.onerror = () => setCurrentlySpeakingId(null);
 
     setCurrentlySpeakingId(msgId);
     window.speechSynthesis.speak(utterance);
+  };
+
+  // Dual-Engine Audio Player: Native Audio Voice for Marathi (mr) & Hindi (hi)
+  const speakText = (msgId, textToSpeak, msgLang) => {
+    // If currently playing, stop playback
+    if (currentlySpeakingId === msgId) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setCurrentlySpeakingId(null);
+      return;
+    }
+
+    // Cancel existing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    const cleaned = cleanTextForSpeech(textToSpeak);
+    if (!cleaned) return;
+
+    const activeLang = msgLang || detectLanguage(textToSpeak);
+    const audioSnippet = cleaned.length > 350 ? cleaned.slice(0, 350) + '...' : cleaned;
+    setCurrentlySpeakingId(msgId);
+
+    // Native High-Quality Audio Voice for Marathi (MR) & Hindi (HI)
+    if (activeLang === 'MR' || activeLang === 'HI') {
+      const targetTl = activeLang === 'MR' ? 'mr' : 'hi';
+      const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(audioSnippet)}&tl=${targetTl}&client=tw-ob`;
+
+      const audio = new Audio(ttsUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setCurrentlySpeakingId(null);
+        audioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        console.warn("Audio element stream error, using WebSpeech fallback");
+        speakWebSpeech(msgId, audioSnippet, activeLang);
+      };
+
+      audio.play().catch((err) => {
+        console.warn("Audio element playback error, using WebSpeech fallback:", err);
+        speakWebSpeech(msgId, audioSnippet, activeLang);
+      });
+      return;
+    }
+
+    // English WebSpeech Engine
+    speakWebSpeech(msgId, audioSnippet, activeLang);
   };
 
   // Toggle Microphone Voice Input
