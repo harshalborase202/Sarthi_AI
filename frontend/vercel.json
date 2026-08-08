@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/scan/:path*",
+      "destination": "https://sarthiai-hrol.onrender.com/api/scan/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://sarthi-ai-cz0n.onrender.com/api/:path*"
+    }
+  ]
+}
