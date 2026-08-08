@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Bot, User, Send, Sparkles, Brain, Save, CheckCircle2, XCircle,
   Clock, ShieldAlert, ArrowRight, RefreshCw, HelpCircle, MessageSquare, 
-  ChevronRight, X, ExternalLink, ShieldCheck, FileText, Award, Layers
+  ChevronRight, X, ExternalLink, ShieldCheck, FileText, Award, Layers,
+  Mic, MicOff, Volume2, VolumeX, Radio
 } from 'lucide-react';
 import { translations } from '../data/translations';
 
@@ -17,10 +18,10 @@ export default function SchemeChatbot({ profile, language }) {
       id: 'welcome_1',
       sender: 'bot',
       text: language === 'HI'
-        ? '👋 **नमस्ते! मैं Sarthi AI योजना अधिकारी हूँ।**\n\nमैं आपकी प्रोफ़ाइल (आयु, राज्य, व्यवसाय) के आधार पर सरकारी योजनाओं की तत्काल जाँच करता हूँ। आप मुझसे किसी भी योजना या पात्रता के बारे में पूछ सकते हैं।'
+        ? '👋 **नमस्ते! मैं Sarthi AI योजना अधिकारी हूँ।**\n\nमैं आपकी प्रोफ़ाइल (आयु, राज्य, व्यवसाय) के आधार पर सरकारी योजनाओं की तत्काल जाँच करता हूँ। आप मुझसे बोलकर या लिखकर किसी भी योजना या पात्रता के बारे में पूछ सकते हैं।'
         : language === 'MR'
-        ? '👋 **नमस्कार! मी Sarthi AI योजना अधिकारी आहे.**\n\nमी तुमच्या प्रोफाइलनुसार (वय, राज्य, व्यवसाय) शासकीय योजनांची पडताळणी करतो. कोणत्याही योजनेबद्दल विचारू शकता.'
-        : "👋 **Hello! I'm Sarthi AI Senior Welfare Officer & Personal Assistant.**\n\nI cross-reference government policy rules against your actual profile to deliver clear, scan-able eligibility cards, document checklists, and verified official recommendations.",
+        ? '👋 **नमस्कार! मी Sarthi AI योजना अधिकारी आहे.**\n\nमी तुमच्या प्रोफाइलनुसार (वय, राज्य, व्यवसाय) शासकीय योजनांची पडताळणी करतो. तुम्ही बोलून किंवा लिहून प्रश्न विचारू शकता.'
+        : "👋 **Hello! I'm Sarthi AI Senior Welfare Officer & Personal Voice Assistant.**\n\nI cross-reference government policy rules against your actual profile. You can speak or type your question in English, Hindi, or Marathi!",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       savedStatus: null
     }
@@ -32,6 +33,102 @@ export default function SchemeChatbot({ profile, language }) {
   const [activeMemoryModalMsg, setActiveMemoryModalMsg] = useState(null);
   const [selectedRetention, setSelectedRetention] = useState('until_delete');
   const [saveSuccessNotice, setSaveSuccessNotice] = useState(null);
+
+  // Voice Assistant States
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(true);
+  const [currentlySpeakingId, setCurrentlySpeakingId] = useState(null);
+  const [autoReadAloud, setAutoReadAloud] = useState(false);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition (STT)
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSpeechSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = language === 'HI' ? 'hi-IN' : language === 'MR' ? 'mr-IN' : 'en-IN';
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInputText(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.warn("Speech recognition notice:", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+  }, [language]);
+
+  // Clean raw markdown for Text-to-Speech (TTS)
+  const cleanTextForSpeech = (rawText) => {
+    if (!rawText) return '';
+    return rawText
+      .replace(/[*#_~`🌾💰📌👤🚦❓📄💡🟢🤖⭐]/g, '')
+      .replace(/https?:\/\/\S+/g, '')
+      .replace(/[\/\\]/g, ' ')
+      .replace(/\n+/g, '. ')
+      .trim();
+  };
+
+  // Speak out text via Web Speech Synthesis
+  const speakText = (msgId, textToSpeak) => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (currentlySpeakingId === msgId) {
+      window.speechSynthesis.cancel();
+      setCurrentlySpeakingId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const cleaned = cleanTextForSpeech(textToSpeak);
+    const utterance = new SpeechSynthesisUtterance(cleaned);
+
+    utterance.lang = language === 'HI' ? 'hi-IN' : language === 'MR' ? 'mr-IN' : 'en-IN';
+    utterance.rate = 0.95; // Clear natural speed
+
+    utterance.onend = () => setCurrentlySpeakingId(null);
+    utterance.onerror = () => setCurrentlySpeakingId(null);
+
+    setCurrentlySpeakingId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Toggle Microphone Voice Input
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert(language === 'HI' ? 'आपका ब्राउज़र वॉयस इनपुट का समर्थन नहीं करता है।' : 'Your browser does not support Speech Recognition.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.lang = language === 'HI' ? 'hi-IN' : language === 'MR' ? 'mr-IN' : 'en-IN';
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.error("Mic error:", err);
+      }
+    }
+  };
 
   // Loading steps animation
   const LOADING_STEPS = [
@@ -64,7 +161,7 @@ export default function SchemeChatbot({ profile, language }) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading, loadingStepIndex]);
+  }, [messages, isLoading, loadingStepIndex, isListening]);
 
   // Loading animation step timer
   useEffect(() => {
@@ -81,6 +178,11 @@ export default function SchemeChatbot({ profile, language }) {
   const handleSendMessage = async (textToSend) => {
     const query = textToSend || inputText;
     if (!query.trim() || isLoading) return;
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
 
     const userMsgId = `user_${Date.now()}`;
     const userMsg = {
@@ -122,17 +224,22 @@ export default function SchemeChatbot({ profile, language }) {
       );
 
       const botMsgId = `bot_${Date.now()}`;
-      setMessages(prev => [
-        ...prev,
-        {
-          id: botMsgId,
-          sender: 'bot',
-          userQuestion: query.trim(),
-          text: botReply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          savedStatus: null
-        }
-      ]);
+      const newBotMsg = {
+        id: botMsgId,
+        sender: 'bot',
+        userQuestion: query.trim(),
+        text: botReply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        savedStatus: null
+      };
+
+      setMessages(prev => [...prev, newBotMsg]);
+
+      // Auto-read aloud if voice mode enabled
+      if (autoReadAloud) {
+        setTimeout(() => speakText(botMsgId, botReply), 600);
+      }
+
     } catch (err) {
       console.error("Chat API error:", err);
       const botMsgId = `bot_${Date.now()}`;
@@ -248,7 +355,6 @@ export default function SchemeChatbot({ profile, language }) {
         isBullet = true;
       }
 
-      // Format bold tags **text**
       const parts = cleaned.split(/(\*\*.*?\*\*)/g);
       const formattedParts = parts.map((part, pIdx) => {
         if (part.startsWith('**') && part.endsWith('**')) {
@@ -289,10 +395,11 @@ export default function SchemeChatbot({ profile, language }) {
   // Render Card-based Scan-able formatting for AI Bot Messages
   const renderBotMessageContent = (msg) => {
     const text = msg.text || '';
+    const isSpeaking = currentlySpeakingId === msg.id;
 
     return (
       <div className="space-y-3.5">
-        {/* Visual Header Badge */}
+        {/* Visual Header Badge & Audio TTS Speaker Button */}
         <div className="flex items-center justify-between border-b border-outline-variant/50 pb-2.5">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -300,9 +407,19 @@ export default function SchemeChatbot({ profile, language }) {
               Government Officer AI Verdict
             </span>
           </div>
-          <span className="text-[10px] bg-primary/10 text-primary font-bold px-2.5 py-0.5 rounded-full">
-            Verified Source
-          </span>
+
+          {/* Audio Read-Aloud Button */}
+          <button
+            onClick={() => speakText(msg.id, text)}
+            className={`flex items-center gap-1.5 text-xs font-extrabold px-3 py-1 rounded-full transition-all active:scale-95 shadow-sm ${
+              isSpeaking
+                ? 'bg-saffron text-primary animate-pulse ring-2 ring-saffron/50'
+                : 'bg-primary/10 hover:bg-primary/20 text-primary'
+            }`}
+          >
+            {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-saffron" />}
+            <span>{isSpeaking ? (language === 'HI' ? 'रोकें' : 'Stop Audio') : (language === 'HI' ? '🔊 सुनें' : '🔊 Listen to Officer')}</span>
+          </button>
         </div>
 
         {/* Formatted Text Markdown Blocks */}
@@ -398,7 +515,6 @@ export default function SchemeChatbot({ profile, language }) {
         {msg.id !== 'welcome_1' && (
           <div className="pt-2 border-t border-outline-variant/40 space-y-2.5">
             
-            {/* Follow-up Action Chips */}
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => handleSendMessage(`What documents do I need for ${msg.userQuestion || 'this scheme'}?`)}
@@ -473,24 +589,40 @@ export default function SchemeChatbot({ profile, language }) {
           </div>
           <div>
             <h1 className="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">
-              Sarthi AI Scheme Assistant
+              Sarthi AI Voice & Scheme Assistant
               <span className="text-[10px] bg-saffron text-primary font-black px-2 py-0.5 rounded-full uppercase">
-                Govt Officer Mode
+                Govt Officer
               </span>
             </h1>
             <p className="text-xs text-slate-200 hidden sm:block font-medium">
-              Profile-aware eligibility checks, scan-able cards, official portal verification, and instant memory saving.
+              Speak or type in English, Hindi, or Marathi. Features automated speech-to-text & voice read-aloud.
             </p>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate('/memory')}
-          className="flex items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/20 transition-all shadow-sm"
-        >
-          <Brain className="w-4 h-4 text-saffron" />
-          <span>Memory Center</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Hands-free Voice Mode Auto-Read Toggle */}
+          <button
+            onClick={() => setAutoReadAloud(!autoReadAloud)}
+            className={`flex items-center gap-1 text-xs font-bold px-3 py-2 rounded-xl border transition-all shadow-sm ${
+              autoReadAloud
+                ? 'bg-saffron text-primary border-saffron font-black'
+                : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+            }`}
+            title="Auto-read AI responses out loud"
+          >
+            <Radio className={`w-3.5 h-3.5 ${autoReadAloud ? 'animate-pulse' : ''}`} />
+            <span className="hidden sm:inline">{autoReadAloud ? 'Voice Mode ON' : 'Voice Mode OFF'}</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/memory')}
+            className="flex items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/20 transition-all shadow-sm"
+          >
+            <Brain className="w-4 h-4 text-saffron" />
+            <span className="hidden sm:inline">Memory Center</span>
+          </button>
+        </div>
       </div>
 
       {/* Success Toast Notification */}
@@ -502,6 +634,21 @@ export default function SchemeChatbot({ profile, language }) {
           </div>
           <button onClick={() => navigate('/memory')} className="underline hover:text-emerald-100 flex items-center gap-1 font-bold">
             View Memory <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Recording Microphone Active Banner */}
+      {isListening && (
+        <div className="bg-rose-600 text-white px-4 py-3 rounded-2xl text-xs font-bold shadow-lg mb-3 flex items-center justify-between animate-pulse flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Mic className="w-5 h-5 text-saffron animate-bounce" />
+            <span>
+              🔴 {language === 'HI' ? 'सुन रहा हूँ... हिंदी, मराठी या अंग्रेजी में अपना प्रश्न बोलें' : 'Listening... Speak your question clearly now'}
+            </span>
+          </div>
+          <button onClick={toggleListening} className="bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-lg font-black text-[11px]">
+            Done
           </button>
         </div>
       )}
@@ -577,21 +724,40 @@ export default function SchemeChatbot({ profile, language }) {
         ))}
       </div>
 
-      {/* Input Box Bar */}
+      {/* Input Box Bar with Microphone STT Voice Button */}
       <div className="flex items-center gap-2 bg-surface dark:bg-surface-container-low border border-outline-variant rounded-2xl p-2 shadow-md flex-shrink-0">
+        
+        {/* Voice Input Mic Button */}
+        <button
+          type="button"
+          onClick={toggleListening}
+          disabled={isLoading || !speechSupported}
+          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm flex-shrink-0 ${
+            isListening
+              ? 'bg-rose-600 text-white animate-bounce ring-4 ring-rose-300'
+              : 'bg-surface-container hover:bg-surface-container-high text-primary border border-outline-variant'
+          }`}
+          title={isListening ? 'Stop listening' : 'Speak your question in Hindi, Marathi or English'}
+        >
+          {isListening ? <MicOff className="w-5 h-5 text-saffron" /> : <Mic className="w-5 h-5 text-primary" />}
+        </button>
+
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           placeholder={
-            language === 'HI'
-              ? 'योजना या अपनी पात्रता के बारे में पूछें...'
-              : 'Ask about any scheme, eligibility, or required documents...'
+            isListening
+              ? (language === 'HI' ? 'बोलें... आपका प्रश्न रिकॉर्ड हो रहा है' : 'Listening... Speak your question now')
+              : (language === 'HI'
+                  ? 'बोलकर या लिखकर अपनी योजना या पात्रता के बारे में पूछें...'
+                  : 'Speak or type about any scheme, eligibility, or required documents...')
           }
-          className="flex-1 bg-transparent px-3 py-2 text-sm text-on-surface focus:outline-none placeholder:text-on-surface-variant/60"
+          className="flex-1 bg-transparent px-2 py-2 text-sm text-on-surface focus:outline-none placeholder:text-on-surface-variant/60"
           disabled={isLoading}
         />
+
         <button
           onClick={() => handleSendMessage()}
           disabled={!inputText.trim() || isLoading}
