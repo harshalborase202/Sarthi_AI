@@ -8,6 +8,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://sarthi-ai-cz0n.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
