@@ -8,7 +8,7 @@ export default function AIReasoningModal({ profile, onComplete, language }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   const steps = [
-    { text: "Initializing BharatAI reasoning model PS01...", detail: "Loading central policy decision matrix & rule definitions." },
+    { text: "Initializing SarthiAI reasoning model...", detail: "Loading central policy decision matrix & rule definitions." },
     { text: `Parsing user profile (Age: ${profile.age || 22}, State: ${profile.state || 'Maharashtra'})...`, detail: "Extracting demographic eligibility parameters." },
     { text: `Evaluating annual family income cap (₹${Number(profile.income || 250000).toLocaleString('en-IN')})...`, detail: "Checking state and central income ceiling tiers." },
     { text: `Verifying occupation (${profile.occupation || 'Student'}) & education level...`, detail: "Cross-referencing targeted scheme benefit categories." },
@@ -59,9 +59,6 @@ export default function AIReasoningModal({ profile, onComplete, language }) {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-black text-primary">{t.reasoningTitle}</h1>
-                <span className="bg-saffron text-primary text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  PS01 Engine
-                </span>
               </div>
               <p className="text-xs text-on-surface-variant mt-1">{t.reasoningSubtitle}</p>
             </div>

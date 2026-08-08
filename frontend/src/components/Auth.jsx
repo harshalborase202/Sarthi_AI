@@ -404,92 +404,24 @@ export default function Auth({ language = 'EN', onClose, onAuthSuccess }) {
           </div>
         )}
 
-        {/* Sign Up Form (With Integrated Aadhaar OCR Photo Upload & Instant 3-Part Auto-Fill) */}
+        {/* Sign Up Form */}
         {mode === 'signup' && (
           <form onSubmit={handleSignUpSubmit} className="space-y-4 pt-1">
             
-            {/* Aadhaar Photo Upload Dropzone */}
-            <div className="bg-surface-container-low border-2 border-dashed border-primary/30 hover:border-primary rounded-2xl p-4 text-center space-y-2 transition-all">
-              <input
-                type="file"
-                ref={fileInputRef}
-                accept="image/*"
-                onChange={handleAadhaarImageUpload}
-                className="hidden"
-              />
-
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-                  {ocrScanning ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-saffron" />
-                  ) : ocrSuccess ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  ) : (
-                    <Camera className="w-5 h-5 text-saffron" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <span className="text-xs font-black text-primary block">
-                    {ocrScanning ? 'Scanning Aadhaar Card with Gemini AI...' : ocrSuccess ? 'Aadhaar Card Scanned & Verified ✓' : 'Upload Aadhaar Photo to Auto-Fill'}
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-medium">
-                    Auto-fills 12-Digit No (Big Bold 4-4-4 Format), Name, State & Age
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={ocrScanning}
-                  className="py-1.5 px-4 bg-primary text-white font-extrabold text-[11px] rounded-xl shadow-sm hover:bg-primary-container transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  <Upload className="w-3.5 h-3.5 text-saffron" />
-                  <span>{ocrScanning ? 'Processing...' : 'Upload Aadhaar Photo'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Auto-filled Aadhaar Fields Badge */}
-            <div className="flex items-center justify-between text-[11px] font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-              <span className="flex items-center gap-1">
-                <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" /> Auto-filled from Aadhaar Photo
-              </span>
-              <span className="text-[10px] text-emerald-600 uppercase font-extrabold">Verified</span>
-            </div>
-
-            {/* Auto-filled Input Fields Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Citizen Details */}
+            <div className="space-y-3">
               <div className="space-y-1">
                 <label className="text-xs font-extrabold text-on-surface flex items-center justify-between">
                   <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-primary" /> Full Name</span>
-                  <span className="text-[9px] font-bold text-emerald-700">Auto-filled</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Full Name from Aadhaar"
+                  placeholder="Full Name"
                   required
                   className="w-full px-3.5 py-2.5 bg-surface border border-outline-variant/60 rounded-xl text-xs font-semibold text-on-surface focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-extrabold text-on-surface flex items-center justify-between">
-                  <span className="flex items-center gap-1"><Hash className="w-3.5 h-3.5 text-primary" /> 12-Digit Aadhaar No.</span>
-                  <span className="text-[9px] font-bold text-emerald-700">Big & Bold (4-4-4)</span>
-                </label>
-                <input
-                  type="text"
-                  name="aadhaarNumber"
-                  maxLength={14}
-                  value={formData.aadhaarNumber}
-                  onChange={handleChange}
-                  placeholder="9999 8888 7777"
-                  className="w-full px-3.5 py-2.5 bg-amber-50/90 border-2 border-saffron rounded-xl text-base font-black font-mono tracking-widest text-primary focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
                 />
               </div>
             </div>
@@ -497,9 +429,8 @@ export default function Auth({ language = 'EN', onClose, onAuthSuccess }) {
             {/* DOB & Calculated Age Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold text-on-surface flex items-center justify-between">
-                  <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-primary" /> Date of Birth (DOB)</span>
-                  <span className="text-[9px] font-bold text-emerald-700">Auto-filled</span>
+                <label className="text-xs font-extrabold text-on-surface flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-primary" /> Date of Birth (DOB)
                 </label>
                 <input
                   type="date"
@@ -526,9 +457,8 @@ export default function Auth({ language = 'EN', onClose, onAuthSuccess }) {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-extrabold text-on-surface flex items-center justify-between">
-                <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-primary" /> State / Domicile</span>
-                <span className="text-[9px] font-bold text-emerald-700">Auto-filled</span>
+              <label className="text-xs font-extrabold text-on-surface flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-primary" /> State / Domicile
               </label>
               <input
                 type="text"
@@ -540,10 +470,10 @@ export default function Auth({ language = 'EN', onClose, onAuthSuccess }) {
               />
             </div>
 
-            {/* User-filled Credentials Header */}
+            {/* User Credentials Header */}
             <div className="border-t border-outline-variant/40 pt-3">
               <span className="text-[11px] font-extrabold text-primary block mb-2">
-                🔑 User Login Credentials (Fill Manually)
+                🔑 User Login Credentials
               </span>
 
               <div className="space-y-3">

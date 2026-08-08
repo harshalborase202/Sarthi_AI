@@ -182,10 +182,10 @@ export default function MemoryCenter({ language }) {
         <div className="inline-flex items-center gap-1.5 bg-saffron text-primary font-black text-xs px-3 py-1 rounded-full shadow-sm">
           <Brain className="w-4 h-4" /> SarthiAI Memory Center
         </div>
-        <h1 className="text-2xl md:text-3xl font-black text-on-surface">
+        <h1 className="text-2xl md:text-3xl font-black text-white drop-shadow-sm">
           {t.memoryHeaderTitle || "What should SarthiAI remember?"}
         </h1>
-        <p className="text-xs md:text-sm text-on-surface-variant max-w-xl mx-auto">
+        <p className="text-xs md:text-sm text-slate-200 max-w-xl">
           Here's everything SarthiAI has asked to remember, and what you decided.
         </p>
       </div>

@@ -21,9 +21,6 @@ export default function ProfileInput({ profile, setProfile, onSubmit, language }
       {/* Banner Card */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary-container to-secondary text-white p-6 md:p-8 shadow-lg mb-8">
         <div className="relative z-10 max-w-xl">
-          <div className="inline-flex items-center gap-2 bg-saffron text-primary font-bold text-xs px-3 py-1 rounded-full mb-3 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" /> Explainable AI Engine PS01 + PS03
-          </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">
             {t.tellUsAbout}
           </h1>
